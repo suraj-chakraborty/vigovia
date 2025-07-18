@@ -20,7 +20,7 @@ const Footer: React.FC = () => {
 
             <div className="flex justify-center md:justify-end">
                 <img
-                    src="../../public/assets/Group 1707485521.png"
+                    src="../assets/Group1707485521.png"
                     alt="Vigovia Logo"
                     className="h-12 w-auto"
                 />

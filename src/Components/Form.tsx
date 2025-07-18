@@ -5,6 +5,7 @@ import generatePdf from "../utils/generatePdf";
 import Footer from "./Footer";
 
 const Form: React.FC = () => {
+    const [loading, setLoading] = useState(false);
     const [days, setDays] = useState<DayPlan[]>([]);
     const [flights, setFlights] = useState<FlightInfo[]>([]);
     const [bookings, setBookings] = useState<HotelBooking[]>([]);
@@ -19,6 +20,22 @@ const Form: React.FC = () => {
     });
 
 
+
+
+    const handleImageUpload = (index: number, file: File) => {
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const updatedDays = [...days];
+                updatedDays[index].image = event.target?.result as string;
+                setDays(updatedDays);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+
+
     const handleAddDay = () => {
         const nextDay = days.length + 1;
         setDays([
@@ -27,6 +44,7 @@ const Form: React.FC = () => {
                 day: nextDay,
                 topic: "",
                 date: "",
+                image: "",
                 activities: [
                     { time: "Morning", description: "" },
                     { time: "Afternoon", description: "" },
@@ -99,21 +117,57 @@ const Form: React.FC = () => {
         setFlights(updatedFlights);
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+    function formatDatePretty(dateStr: string): string {
+        const date = new Date(dateStr);
+        if (isNaN(date)) return "";
 
-        const finalData: ItineraryData = {
-            ...formData,
-            days,
-            flights,
-            bookings,
+        const day = date.getDate();
+        const month = date.toLocaleString("default", { month: "long" });
+
+        const suffix = (d: number) => {
+            if (d > 3 && d < 21) return "th";
+            switch (d % 10) {
+                case 1: return "st";
+                case 2: return "nd";
+                case 3: return "rd";
+                default: return "th";
+            }
         };
 
-        generatePdf(finalData); // send to PDF generator
+        return `${day}${suffix(day)} ${month}`;
+    }
+
+
+
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true); // start loading indicator
+
+        try {
+            const formattedDays = days.map((day) => ({
+                ...day,
+                formattedDate: formatDatePretty(day.date),
+            }));
+            const finalData: ItineraryData = {
+                ...formData,
+                days: formattedDays,
+                flights,
+                bookings,
+
+            };
+            console.log("Final Data to be sent:", finalData);
+
+            await generatePdf(finalData);
+        } catch (err) {
+            console.error("PDF generation failed", err);
+        } finally {
+            setLoading(false); // stop loading indicator
+        }
     };
 
     return (
-        <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow">
+        !loading || loading ? (<div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow">
             <h1 className="text-2xl font-bold mb-4">Create Your Itinerary</h1>
             <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Trip info */}
@@ -237,6 +291,25 @@ const Form: React.FC = () => {
                                 onChange={(e) => handleDayChange(index, "topic", e.target.value)}
                                 className="border p-2 rounded"
                             />
+                            <div className="mt-3">
+                                <label className="block font-medium">Upload Image:</label>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) handleImageUpload(index, file);
+                                    }}
+                                />
+                                {day.image && (
+                                    <img
+                                        src={day.image}
+                                        alt="Preview"
+                                        className="mt-2 rounded-full w-24 h-24 object-cover"
+                                    />
+                                )}
+                            </div>
+
 
                             {day.activities.map((activity, aIndex) => (
                                 <div key={aIndex} className="mb-2">
@@ -248,6 +321,7 @@ const Form: React.FC = () => {
                                         onChange={(e) => handleActivityChange(index, aIndex, e.target.value)}
                                         className="col-span-2 border p-2 rounded"
                                     />
+
                                 </div>
                             ))}
                         </div>
@@ -315,12 +389,17 @@ const Form: React.FC = () => {
 
                 <button
                     type="submit"
-                    className="px-4 py-2 bg-indigo-600 text-white rounded"
+
+                    className="px-4 py-2 cursor-pointer bg-indigo-600 text-white rounded"
                 >
                     Generate Itinerary PDF
                 </button>
             </form>
-        </div>
+        </div>) : (
+            <div className="flex items-center justify-center h-screen">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600"></div>
+            </div>
+        )
     );
 };
 

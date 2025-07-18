@@ -4,7 +4,9 @@ export interface Activity {
 }
 
 export interface DayPlan {
+    formattedDate(formattedDate: any, arg1: number, arg2: number, arg3: { align: "center"; }): unknown;
     day: number;
+    image: string;
     topic: string;
     date: string;
     activities: Activity[];
