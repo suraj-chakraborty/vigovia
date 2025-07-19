@@ -552,7 +552,7 @@ const generatePdf = async (data: ItineraryData) => {
     ];
 
     // Draw the dynamic table (can be placed anywhere in your PDF code)
-    drawTables(doc, headings, installments, installments.length * 12, 4, 80);
+    drawTables(doc, headings, installments, installments.length * 6, 4, y);
 
 
     // // Calculate section heights
