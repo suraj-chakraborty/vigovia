@@ -1,10 +1,15 @@
+import type { PDFDocument, TableHeadings, TableRows } from "../types/itinerary";
 
 //!function to make a circular image data url
-export function getCircularImageDataUrl(src, size, scale = 2) {
-    return new Promise((resolve) => {
-        const canvas = document.createElement('canvas');
+export function getCircularImageDataUrl(
+    src: string,
+    size: number,
+    scale: number = 2
+): Promise<string> {
+    return new Promise((resolve: (value: string) => void) => {
+        const canvas: HTMLCanvasElement = document.createElement('canvas');
         canvas.width = canvas.height = size * scale;
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
         ctx.scale(scale, scale);
 
         // Fill background with white
@@ -29,36 +34,38 @@ export function getCircularImageDataUrl(src, size, scale = 2) {
 
 //!function to draw custom tables in PDF
 //!--------------------------------
+// PDF document interface (jsPDF or similar)
+
 export function drawTables(
-    doc,
-    headings,
-    rows,
-    boxHeight,
-    startX,
-    startY,
+    doc: PDFDocument,
+    headings: TableHeadings,
+    rows: TableRows,
+    boxHeight: number,
+    startX: number,
+    startY: number,
     colRatios: number[] | null,
-    bottomBoxHeight = 20,
+    bottomBoxHeight: number = 20,
     // verticalSpacing = 20,
-) {
+): void {
     const pageWidth = doc.internal.pageSize.getWidth();
     const margin = startX;
     const numCols = headings.length;
     const containerWidth = pageWidth - 2 * margin;
     const colGap = 2;
 
-    let colWidths;
+    let colWidths: number[];
     if (colRatios && colRatios.length === numCols) {
         colWidths = colRatios.map(r => r * containerWidth - colGap);
     } else {
-        const totalTextLength = headings.reduce((sum, h) => sum + h.length, 0);
-        colWidths = headings.map(h => (h.length / totalTextLength) * containerWidth - colGap);
+        const totalTextLength: number = headings.reduce((sum: number, h: string) => sum + h.length, 0);
+        colWidths = headings.map((h: string) => (h.length / totalTextLength) * containerWidth - colGap);
     }
 
     const headerHeight = 25;
-    const boxRadius = 10;
+    const boxRadius = 5;
 
     // Calculate column x positions
-    const colX = [];
+    const colX: number[] = [];
     let currentX = margin;
     for (let i = 0; i < numCols; i++) {
         colX.push(currentX);
@@ -80,7 +87,7 @@ export function drawTables(
         doc.roundedRect(x, startY + headerHeight + boxHeight - 25, colWidth, bottomBoxHeight, boxRadius, boxRadius, "F");
 
         // Header text
-        doc.setFontSize(14);
+        doc.setFontSize(12);
         doc.setTextColor("white");
         doc.setFont("helvetica", "bold");
         doc.text(headings[i], x + colWidth / 2, startY + 5, { align: "center" });
@@ -89,7 +96,7 @@ export function drawTables(
     // Draw table rows
     let currentY = startY + headerHeight;
 
-    doc.setFont("helvetica", "normal");
+    doc.setFont("Roboto", "light");
     doc.setFontSize(12);
     doc.setTextColor("black");
 
@@ -97,7 +104,7 @@ export function drawTables(
         let maxLinesInRow = 1;
 
         // First pass: calculate line breaks
-        const cellLines = rows[row].map((cell, colIndex) => {
+        const cellLines: string[][] = rows[row].map((cell, colIndex) => {
             const text = cell !== undefined ? String(cell) : "";
             const lines = doc.splitTextToSize(text, colWidths[colIndex] - 10);
             maxLinesInRow = Math.max(maxLinesInRow, lines.length);
