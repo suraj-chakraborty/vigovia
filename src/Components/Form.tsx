@@ -3,6 +3,7 @@ import type { DayPlan, FlightInfo, HotelBooking, ItineraryData } from "../types/
 
 import generatePdf from "../utils/generatePdf";
 import Footer from "./Footer";
+import logoImage from "../assets/Group1707485521.png"; // Assuming you have a logo image
 
 const Form: React.FC = () => {
     const [loading, setLoading] = useState(false);
@@ -19,6 +20,31 @@ const Form: React.FC = () => {
         bookings,
     });
 
+
+    const Input = ({ label, type = "text", value, onChange, className = "" }) => (
+        <div className={`flex flex-col ${className}`}>
+            <label className="text-sm font-medium text-[#321E5D] mb-1">{label}</label>
+            <input
+                type={type}
+                value={value}
+                onChange={onChange}
+                className="border border-[#936FE0] p-2 rounded bg-white"
+            />
+        </div>
+    );
+
+    const Button = ({ label, onClick, secondary = false }) => (
+        <button
+            type="button"
+            onClick={onClick}
+            className={`px-4 py-2 rounded shadow-md font-medium transition ${secondary
+                ? "bg-white text-[#680099] border border-[#680099] hover:bg-[#FBF4FF]"
+                : "bg-[#541C9C] text-white hover:bg-[#680099]"
+                }`}
+        >
+            {label}
+        </button>
+    );
 
 
 
@@ -167,235 +193,105 @@ const Form: React.FC = () => {
     };
 
     return (
-        !loading || loading ? (<div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow">
-            <h1 className="text-2xl font-bold mb-4">Create Your Itinerary</h1>
-            <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Trip info */}
-                <div className="grid grid-cols-2 gap-4">
-                    <input
-                        type="text"
-                        placeholder="Your Name"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="border p-2 rounded"
-                        required
-                    />
-                    <input
-                        type="number"
-                        min={1}
-                        placeholder="No. of Travelers"
-                        value={formData.travelers}
-                        onChange={(e) => setFormData({ ...formData, travelers: +e.target.value })}
-                        className="border p-2 rounded"
-                        required
-                    />
-                    <input
-                        type="text"
-                        placeholder="Departure City"
-                        value={formData.departureCity}
-                        onChange={(e) => setFormData({ ...formData, departureCity: e.target.value })}
-                        className="border p-2 rounded"
-                        required
-                    />
-                    <input
-                        type="text"
-                        placeholder="Destination City"
-                        value={formData.destinationCity}
-                        onChange={(e) => setFormData({ ...formData, destinationCity: e.target.value })}
-                        className="border p-2 rounded"
-                        required
-                    />
-                    <input
-                        type="date"
-                        value={formData.departureDate}
-                        onChange={(e) => setFormData({ ...formData, departureDate: e.target.value })}
-                        className="border p-2 rounded"
-                        required
-                    />
-                    <input
-                        type="date"
-                        value={formData.returnDate}
-                        onChange={(e) => setFormData({ ...formData, returnDate: e.target.value })}
-                        className="border p-2 rounded"
-                        required
-                    />
-                </div>
+        !loading || loading ? (<div className="max-w-4xl mx-auto p-6 rounded-lg shadow-lg bg-[#FBF4FF]">
+            {/* LOGO at Top */}
+            <div className="flex justify-center mb-6">
+                <img src={logoImage} alt="Logo" className="h-16 md:h-20 object-contain" />
+            </div>
+            <h1 className="text-3xl font-bold text-[#321E5D] mb-6 text-center">Create Your Itinerary</h1>
+            <form onSubmit={handleSubmit} className="space-y-8">
+
+                {/* Trip Info */}
+                <fieldset className="border border-[#936FE0] rounded-lg p-4 bg-white">
+                    <legend className="text-lg font-semibold text-[#680099] px-2">Trip Details</legend>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <Input label="Your Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+                        <Input label="No. of Travelers" type="number" value={formData.travelers} onChange={(e) => setFormData({ ...formData, travelers: +e.target.value })} />
+                        <Input label="Departure City" value={formData.departureCity} onChange={(e) => setFormData({ ...formData, departureCity: e.target.value })} />
+                        <Input label="Destination City" value={formData.destinationCity} onChange={(e) => setFormData({ ...formData, destinationCity: e.target.value })} />
+                        <Input label="Departure Date" type="date" value={formData.departureDate} onChange={(e) => setFormData({ ...formData, departureDate: e.target.value })} />
+                        <Input label="Return Date" type="date" value={formData.returnDate} onChange={(e) => setFormData({ ...formData, returnDate: e.target.value })} />
+                    </div>
+                </fieldset>
+
                 {/* Flights */}
-                <div>
-                    <h2 className="font-semibold mt-6 mb-2">Flights</h2>
+                <fieldset className="border border-[#936FE0] rounded-lg p-4 bg-white">
+                    <legend className="text-lg font-semibold text-[#680099] px-2">Flights</legend>
                     {flights.map((flight, index) => (
-                        <div key={index} className="grid grid-cols-4 gap-2 mb-2">
-                            <input
-                                type="date"
-                                placeholder="Date"
-                                value={flight.departureDate}
-                                onChange={(e) => handleFlightChange(index, "departureDate", e.target.value)}
-                                className="border p-2 rounded"
-                            />
-                            <input
-                                type="text"
-                                placeholder="From"
-                                value={flight.from}
-                                onChange={(e) => handleFlightChange(index, "from", e.target.value)}
-                                className="border p-2 rounded"
-                            />
-                            <input
-                                type="text"
-                                placeholder="To"
-                                value={flight.to}
-                                onChange={(e) => handleFlightChange(index, "to", e.target.value)}
-                                className="border p-2 rounded"
-                            />
-                            <input
-                                type="date"
-                                placeholder="Date"
-                                value={flight.arrivalDate}
-                                onChange={(e) => handleFlightChange(index, "arrivalDate", e.target.value)}
-                                className="border p-2 rounded"
-                            />
-                            <input
-                                type="number"
-                                placeholder="Np. of Travellers"
-                                value={flight.noOfTravellers}
-                                onChange={(e) => handleFlightChange(index, "noOfTravellers", e.target.value)}
-                                className="border p-2 rounded"
-                            />
+                        <div key={index} className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-4">
+                            <Input type="date" label="Departure Date" value={flight.departureDate} onChange={(e) => handleFlightChange(index, "departureDate", e.target.value)} />
+                            <Input label="From" value={flight.from} onChange={(e) => handleFlightChange(index, "from", e.target.value)} />
+                            <Input label="To" value={flight.to} onChange={(e) => handleFlightChange(index, "to", e.target.value)} />
+                            <Input type="date" label="Arrival Date" value={flight.arrivalDate} onChange={(e) => handleFlightChange(index, "arrivalDate", e.target.value)} />
+                            <Input type="number" label="No. of Travellers" value={flight.noOfTravellers} onChange={(e) => handleFlightChange(index, "noOfTravellers", e.target.value)} />
                         </div>
                     ))}
-                    <button
-                        type="button"
-                        onClick={handleAddFlight}
-                        className="px-4 py-2 bg-indigo-600 text-white rounded"
-                    >
-                        + Add Flight
-                    </button>
-                    <button className="px-4 py-2 bg-indigo-600 text-white rounded" type="button" onClick={handleDelete}> - Delete </button>
-                </div>
+                    <div className="flex gap-4 mt-4">
+                        <Button label="+ Add Flight" onClick={handleAddFlight} />
+                        <Button label="- Delete" onClick={handleDelete} secondary />
+                    </div>
+                </fieldset>
 
-                {/* Day-wise plans */}
-                <div>
-                    <h2 className="font-semibold mt-6 mb-2">Itinerary Days</h2>
+                {/* Days */}
+                <fieldset className="border border-[#936FE0] rounded-lg p-4 bg-white">
+                    <legend className="text-lg font-semibold text-[#680099] px-2">Itinerary Days</legend>
                     {days.map((day, index) => (
-                        <div key={index} className="border p-4 mb-3 rounded-md">
-                            <label className="block font-medium">Day {day.day} Date:</label>
-                            <input
-                                type="date"
-                                value={day.date}
-                                onChange={(e) => handleDayChange(index, "date", e.target.value)}
-                                className="border p-2 rounded"
-                            />
-                            <label className="block font-medium">Topic:</label>
-                            <input
-                                type="text"
-                                value={day.topic}
-                                onChange={(e) => handleDayChange(index, "topic", e.target.value)}
-                                className="border p-2 rounded"
-                            />
+                        <div key={index} className="border border-[#936FE0] rounded-md p-4 mb-4 bg-[#FBF4FF]">
+                            <Input label={`Day ${day.day} Date`} type="date" value={day.date} onChange={(e) => handleDayChange(index, "date", e.target.value)} />
+                            <Input label="Topic" value={day.topic} onChange={(e) => handleDayChange(index, "topic", e.target.value)} />
                             <div className="mt-3">
-                                <label className="block font-medium">Upload Image:</label>
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={(e) => {
-                                        const file = e.target.files?.[0];
-                                        if (file) handleImageUpload(index, file);
-                                    }}
-                                />
+                                <label className="block text-sm font-medium text-[#321E5D] mb-1">Upload Image:</label>
+                                <input type="file" accept="image/*" onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) handleImageUpload(index, file);
+                                }} />
                                 {day.image && (
-                                    <img
-                                        src={day.image}
-                                        alt="Preview"
-                                        className="mt-2 rounded-full w-24 h-24 object-cover"
-                                    />
+                                    <img src={day.image} alt="Preview" className="mt-2 rounded-full w-24 h-24 object-cover" />
                                 )}
                             </div>
-
-
                             {day.activities.map((activity, aIndex) => (
-                                <div key={aIndex} className="mb-2">
-                                    <label className="block text-sm">{activity.time}:</label>
-                                    <input
-                                        type="text"
-                                        placeholder={`Activity for ${activity.time}`}
-                                        value={activity.description}
-                                        onChange={(e) => handleActivityChange(index, aIndex, e.target.value)}
-                                        className="col-span-2 border p-2 rounded"
-                                    />
-
+                                <div key={aIndex} className="mt-3">
+                                    <label className="block text-sm font-medium text-[#321E5D]">{activity.time}:</label>
+                                    <input type="text" value={activity.description} placeholder={`Activity for ${activity.time}`} onChange={(e) => handleActivityChange(index, aIndex, e.target.value)}
+                                        className="w-full border border-[#936FE0] p-2 rounded bg-white mt-1" />
                                 </div>
                             ))}
                         </div>
                     ))}
-                    <button
-                        type="button"
-                        onClick={handleAddDay}
-                        className="px-4 py-2 bg-indigo-600 text-white rounded"
-                    >
-                        + Add Day
-                    </button>
-                    <button className="px-4 py-2 bg-indigo-600 text-white rounded" type="button" onClick={handleDelete}> - Delete </button>
-                </div>
-                <div className="p-4 bg-white rounded-md shadow-md space-y-4">
-                    <h2 className="text-lg font-semibold text-purple-700">Hotel Booking</h2>
+                    <div className="flex gap-4 mt-4">
+                        <Button label="+ Add Day" onClick={handleAddDay} />
+                        <Button label="- Delete" onClick={handleDelete} secondary />
+                    </div>
+                </fieldset>
+
+                {/* Hotel Booking */}
+                <fieldset className="border border-[#936FE0] rounded-lg p-4 bg-white">
+                    <legend className="text-lg font-semibold text-[#680099] px-2">Hotel Booking</legend>
                     {bookings.map((booking, index) => (
-                        <div className="grid grid-cols-2 gap-4">
-                            <input
-                                type="text"
-                                placeholder="City"
-                                value={booking.city}
-                                onChange={(e) => handleBookingChange(index, "city", e.target.value)}
-                                className="border p-2 rounded"
-                            />
-                            <input
-                                type="date"
-                                placeholder="Check In"
-                                value={booking.checkIn}
-                                onChange={(e) => handleBookingChange(index, "checkIn", e.target.value)}
-                                className="border p-2 rounded"
-                            />
-                            <input
-                                type="date"
-                                placeholder="Check Out"
-                                value={booking.checkOut}
-                                onChange={(e) => handleBookingChange(index, "checkOut", e.target.value)}
-                                className="border p-2 rounded"
-                            />
-                            {/* <input
-                                type="number"
-                                placeholder="Nights"
-                                value={booking.nights}
-                                onChange={(e) => handleBookingChange(index, "nights", e.target.value)}
-                                className="border p-2 rounded"
-                            /> */}
-                            <p className="col-span-2 border p-2 rounded">Nights: {booking.nights}</p>
-                            <input
-                                type="text"
-                                placeholder="Hotel Name"
-                                value={booking.hotelName}
-                                onChange={(e) => handleBookingChange(index, "hotelName", e.target.value)}
-                                className="col-span-2 border p-2 rounded"
-                            />
+                        <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <Input label="City" value={booking.city} onChange={(e) => handleBookingChange(index, "city", e.target.value)} />
+                            <Input label="Check In" type="date" value={booking.checkIn} onChange={(e) => handleBookingChange(index, "checkIn", e.target.value)} />
+                            <Input label="Check Out" type="date" value={booking.checkOut} onChange={(e) => handleBookingChange(index, "checkOut", e.target.value)} />
+                            <p className="col-span-2 text-[#321E5D] border border-[#936FE0] p-2 rounded">Nights: {booking.nights}</p>
+                            <Input label="Hotel Name" value={booking.hotelName} onChange={(e) => handleBookingChange(index, "hotelName", e.target.value)} className="col-span-2" />
                         </div>
                     ))}
-                    <button
-                        type="button"
-                        className="px-4 py-2 bg-indigo-600 text-white rounded"
-                        onClick={onAddBooking}
-                    >
-                        Add Booking
+                    <div className="mt-4">
+                        <Button label="Add Booking" onClick={onAddBooking} />
+                    </div>
+                </fieldset>
+
+                {/* Submit Button */}
+                <div className="text-center">
+                    <button type="submit" className="px-6 py-3 bg-[#541C9C] hover:bg-[#680099] text-white rounded-lg text-lg font-semibold shadow-md transition">
+                        Generate Itinerary PDF
                     </button>
                 </div>
+
                 <Footer />
-
-                <button
-                    type="submit"
-
-                    className="px-4 py-2 cursor-pointer bg-indigo-600 text-white rounded"
-                >
-                    Generate Itinerary PDF
-                </button>
             </form>
-        </div>) : (
+        </div>
+        ) : (
             <div className="flex items-center justify-center h-screen">
                 <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600"></div>
             </div>

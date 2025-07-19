@@ -1,4 +1,5 @@
 import React from "react";
+import logoImage from "../assets/Group1707485521.png"
 
 const Footer: React.FC = () => {
     return (
@@ -20,7 +21,7 @@ const Footer: React.FC = () => {
 
             <div className="flex justify-center md:justify-end">
                 <img
-                    src="../assets/Group1707485521.png"
+                    src={logoImage}
                     alt="Vigovia Logo"
                     className="h-12 w-auto"
                 />
