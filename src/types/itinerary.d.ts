@@ -81,3 +81,16 @@ export interface PDFDocument {
 
 export type TableHeadings = string[];
 export type TableRows = (string | number | undefined)[][];
+
+
+export type Installment = {
+    installment: string;
+    amount: string;
+    dueDate: string;
+};
+
+
+export type PaymentEntry = {
+    label: string;
+    value: string;
+};

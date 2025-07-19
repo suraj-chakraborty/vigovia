@@ -36,7 +36,7 @@ const generatePdf = async (data: ItineraryData) => {
     // Push `y` down after logo to avoid overlap
     y = logoY + logoHeight + 10;
 
-    const { name, departureCity, destinationCity, departureDate, returnDate, travelers, days, flights, bookings } = data;
+    const { name, departureCity, destinationCity, departureDate, returnDate, travelers, days, flights, bookings, payments, installments } = data;
 
 
 
@@ -306,6 +306,7 @@ const generatePdf = async (data: ItineraryData) => {
         y += 5;
         doc.setDrawColor(200);
         doc.line(20, y, 190, y);
+        y += y + 20
     }
 
     const pageHeight = doc.internal.pageSize.getHeight();
@@ -318,8 +319,11 @@ const generatePdf = async (data: ItineraryData) => {
         }
 
         doc.setFontSize(14);
-        doc.setTextColor("#9333EA");
-        doc.text("Hotel Bookings", 20, y + 5);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(0, 0, 0);
+        doc.text("Hotel ", 15, y - componentHeight);
+        doc.setTextColor(138, 43, 226); // Purple for "Notes"
+        doc.text("Booking", doc.getTextWidth("Important ") + 5, y - componentHeight);
 
 
         const rows = bookings.map((b) => [
@@ -330,9 +334,9 @@ const generatePdf = async (data: ItineraryData) => {
             b.hotelName,
         ])
         const rat = ["City", "Check In", "Check Out", "Nights", "Hotel Name"];
-        y += rows.length * 30 + 10;
-        drawTables(doc, rat, [...rows], rows.length * 15, 20, 95, 5, [0.3, 0.2, 0.2, 0.1, 0.2]);
-        y += 30;
+        y += 20;
+        drawTables(doc, rat, [...rows], rows.length * 15, 20, y - componentHeight, 10, [0.3, 0.2, 0.2, 0.1, 0.2]);
+        y += 10;
         // Notes
         const notes = [
             "1. All Hotels Are Tentative And Can Be Replaced With Similar.",
@@ -468,7 +472,7 @@ const generatePdf = async (data: ItineraryData) => {
     doc.text(" Condition", doc.getTextWidth("Important ") + 14, y + 190);
     doc.setFontSize(12);
     doc.setFont("helvetica", "Bold")
-    doc.setTextColor("blue");
+    doc.setTextColor("#2F80ED");
     doc.text("Transfer Policy(Refundable Upon Claim)", 15, y + 200);
     doc.addPage()
 
@@ -480,14 +484,17 @@ const generatePdf = async (data: ItineraryData) => {
         }
 
         doc.setFontSize(14);
-        doc.setTextColor("#6D28D9"); // Purple
-        doc.text("Payment Plan", 20, y);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(0, 0, 0);
+        doc.text("Payment ", 15, y);
+        doc.setTextColor(138, 43, 226); // Purple for "Notes"
+        doc.text("Plan", doc.getTextWidth("Important ") + 15, y);
         y += 10;
 
-        const payments = [
-            { label: "Total Amount", value: "₹ 9,00,000 For 3 Pax (Inclusive Of GST)" },
-            { label: "TCS", value: "Not Collected" },
-        ];
+        // const payments = [
+        //     { label: "Total Amount", value: "₹ 9,00,000 For 3 Pax (Inclusive Of GST)" },
+        //     { label: "TCS", value: "Not Collected" },
+        // ];
 
         payments.map((p) => {
             if (y > 240) {
@@ -531,26 +538,36 @@ const generatePdf = async (data: ItineraryData) => {
             y += boxHeight;
         });
     }
+    //!---------------------installments----------------------------------------
+    // const headings = ["Installment", "Amount", "Due Date"];
+    // const installments = [
+    //     ["Installment 1", "₹3,50,000", "Initial Payment"],
+    //     ["Installment 2", "₹4,00,000", "Post Visa Approval"],
+    //     ["Installment 3", "Remaining", "20 Days Before Departure"],
+    //     ["Installment 4", "Remaining", "20 Days Before Departure"],
+    //     ["Installment 5", "Remaining", "20 Days Before Departure"]
+    // ];
 
-    const headings = ["Installment", "Amount", "Due Date"];
-    const installments = [
-        ["Installment 1", "₹3,50,000", "Initial Payment"],
-        ["Installment 2", "₹4,00,000", "Post Visa Approval"],
-        ["Installment 3", "Remaining", "20 Days Before Departure"],
-        ["Installment 4", "Remaining", "20 Days Before Departure"],
-        ["Installment 5", "Remaining", "20 Days Before Departure"]
-    ];
+    const InstallmentsData = installments.map((ins) => [
+        ins.installment,
+        ins.amount,
+        ins.dueDate
+    ])
+    console.log(InstallmentsData)
+    const InstallmentHead = ["Installment", "amount", "DueDate"];
 
     // Draw the dynamic table (can be placed anywhere in your PDF code)
-    drawTables(doc, headings, installments, installments.length * 7, 15, y + 10, 6);
+    drawTables(doc, InstallmentHead, InstallmentsData, InstallmentsData.length * 10, 15, y + 10, 6);
 
-    y *= 2;
+    y += y + InstallmentsData.length * 5;
 
     // Visa Details Title
-    doc.setFontSize(13);
-    doc.setTextColor(50, 0, 120);
+    doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
-    doc.text('Visa Details', 15, y);
+    doc.setTextColor(0, 0, 0);
+    doc.text("Visa ", 15, y);
+    doc.setTextColor(138, 43, 226); // Purple for "Notes"
+    doc.text("Details", doc.getTextWidth("Important ") + 5, y);
 
     y += 6;
 
@@ -558,9 +575,9 @@ const generatePdf = async (data: ItineraryData) => {
     const Visalabels = ["Visa Type:", "Validity:", "Type"];
     const Visavalues = ["Tourist", "30 Days", "14/06/2025"];
 
-    const VboxWidth = 170;
+    const VboxWidth = 180;
     const VboxHeight = 20;
-    const VstartX = 20;
+    const VstartX = 15;
     const VnumCols = Visalabels.length;
     const VcolWidth = boxWidth / VnumCols;
 

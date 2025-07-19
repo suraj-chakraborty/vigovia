@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import type { DayPlan, FlightInfo, HotelBooking, ItineraryData } from "../types/itinerary";
+import type { DayPlan, FlightInfo, HotelBooking, Installment, ItineraryData, PaymentEntry } from "../types/itinerary";
 import logoImage from "../assets/Group1707485521.png"
 import generatePdf from "../utils/generatePdf";
 
@@ -17,8 +17,49 @@ const Form: React.FC = () => {
         travelers: 1,
         bookings,
     });
+    const [payments, setPayments] = useState<PaymentEntry[]>([
+        { label: "Total Amount", value: "₹ 9,00,000 For 3 Pax (Inclusive Of GST)" },
+        { label: "TCS", value: "Not Collected" },
+    ]);
 
+    const [installments, setInstallments] = useState<Installment[]>([
+        { installment: "Installment 1", amount: "₹3,50,000", dueDate: "Initial Payment" },
+        { installment: "Installment 2", amount: "₹4,00,000", dueDate: "Post Visa Approval" },
+        { installment: "Installment 3", amount: "Remaining", dueDate: "20 Days Before Departure" },
+        { installment: "Installment 4", amount: "Remaining", dueDate: "20 Days Before Departure" },
+        { installment: "Installment 5", amount: "Remaining", dueDate: "20 Days Before Departure" },
+    ]);
 
+    const handlePaymentChange = (
+        index: number,
+        key: keyof PaymentEntry,
+        value: string
+    ) => {
+        const updated = [...payments];
+        updated[index][key] = value;
+        setPayments(updated);
+    };
+
+    const addInstallment = () => {
+        const newInstallment: Installment = {
+            installment: `Installment ${installments.length + 1}`,
+            amount: "Remaining",
+            dueDate: "",
+        };
+        setInstallments([...installments, newInstallment]);
+    };
+
+    const removeInstallment = (index: number) => {
+        const updated = [...installments];
+        updated.splice(index, 1);
+        setInstallments(updated);
+    };
+
+    const updateInstallment = (index: number, field: keyof Installment, value: string) => {
+        const updated = [...installments];
+        updated[index][field] = value;
+        setInstallments(updated);
+    };
 
 
     const handleImageUpload = (index: number, file: File) => {
@@ -165,9 +206,10 @@ const Form: React.FC = () => {
                 days: formattedDays,
                 flights,
                 bookings,
-
+                payments,
+                installments
             };
-            // console.log("Final Data to be sent:", finalData);
+            console.log("Final Data to be sent:", finalData);
 
             await generatePdf(finalData);
         } catch (err) {
@@ -473,6 +515,70 @@ const Form: React.FC = () => {
                     >
                         Add Booking
                     </button>
+                </div>
+                {/* Installment Breakdown Section */}
+                <div className="mt-12">
+                    <h2 className="text-2xl font-bold text-[#321E5D] mb-4">Installment Breakdown</h2>
+                    {installments.map((item, index) => (
+                        <div
+                            key={index}
+                            className="grid grid-cols-4 gap-4 bg-[#f6f0ff] border border-[#d3c2f2] rounded-xl p-4 mb-3 shadow-sm"
+                        >
+                            <input
+                                className="p-3 rounded-md border border-[#d3c2f2] bg-white focus:outline-none focus:ring-2 focus:ring-[#b993f8]"
+                                type="text"
+                                placeholder="Installment"
+                                value={item.installment}
+                                onChange={(e) => updateInstallment(index, "installment", e.target.value)}
+                            />
+                            <input
+                                className="p-3 rounded-md border border-[#d3c2f2] bg-white focus:outline-none focus:ring-2 focus:ring-[#b993f8]"
+                                type="text"
+                                placeholder="Amount"
+                                value={item.amount}
+                                onChange={(e) => updateInstallment(index, "amount", e.target.value)}
+                            />
+                            <input
+                                className="p-3 rounded-md border border-[#d3c2f2] bg-white focus:outline-none focus:ring-2 focus:ring-[#b993f8]"
+                                type="text"
+                                placeholder="Due Date"
+                                value={item.dueDate}
+                                onChange={(e) => updateInstallment(index, "dueDate", e.target.value)}
+                            />
+                            <button
+                                onClick={() => removeInstallment(index)}
+                                className="text-sm text-red-600 hover:text-red-800 transition"
+                            >
+                                Remove
+                            </button>
+                        </div>
+                    ))}
+
+                    <button
+                        type="button"
+                        onClick={addInstallment}
+                        className="mt-2 px-6 py-2 bg-[#541C9C] hover:bg-[#680099] text-white rounded-lg transition-colors duration-300"
+                    >
+                        Add Installment
+                    </button>
+                </div>
+
+                {/* Payment Summary Section */}
+                <div className="mt-12">
+                    <h2 className="text-2xl font-bold text-[#321E5D] mb-4">Payment Plan</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        {payments.map((p, index) => (
+                            <div key={index} className="flex flex-col">
+                                <label className="text-sm text-[#321E5D] font-medium mb-1">{p.label}</label>
+                                <input
+                                    type="text"
+                                    value={p.value}
+                                    onChange={(e) => handlePaymentChange(index, "value", e.target.value)}
+                                    className="p-3 border border-[#680099] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#541C9C]"
+                                />
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
 
