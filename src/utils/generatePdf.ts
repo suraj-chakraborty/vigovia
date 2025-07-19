@@ -38,7 +38,13 @@ const generatePdf = async (data: ItineraryData) => {
 
     const { name, departureCity, destinationCity, departureDate, returnDate, travelers, days, flights, bookings } = data;
 
-    const totalDays = days.length;
+
+
+    const departure = new Date(departureDate);
+    const returning = new Date(returnDate);
+    const diffInMs = returning.getTime() - departure.getTime();
+    const totalDays = Math.ceil(diffInMs / (1000 * 60 * 60 * 24));
+    console.log(totalDays)
     const nights = totalDays - 1;
 
 
@@ -312,7 +318,7 @@ const generatePdf = async (data: ItineraryData) => {
         }
 
         doc.setFontSize(14);
-        doc.setTextColor("#9333EA"); // Purple
+        doc.setTextColor("#9333EA");
         doc.text("Hotel Bookings", 20, y + 5);
 
 
@@ -357,7 +363,7 @@ const generatePdf = async (data: ItineraryData) => {
     doc.setFont("helvetica", "bold");
     doc.setTextColor(0, 0, 0);
     doc.text("Important ", 14, y);
-    doc.setTextColor(138, 43, 226); // Purple for "Notes"
+    doc.setTextColor(138, 43, 226);
     doc.text("Notes", doc.getTextWidth("Important ") + 14, y);
     const HeaderNotes = ["Point", "Details"]
     const notes = [
@@ -376,9 +382,9 @@ const generatePdf = async (data: ItineraryData) => {
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(0, 0, 0);
-    doc.text("Scope Of ", 14, y);
+    doc.text("Scope Of ", 14, y + 20);
     doc.setTextColor(138, 43, 226); // Purple for "Service"
-    doc.text("Service", doc.getTextWidth("Scope Of ") + 14, y);
+    doc.text("Service", doc.getTextWidth("Scope Of ") + 14, y + 20);
     const serviceHeader = ["Service", "Details"];
     const services = [
         ["Flight Tickets And Hotel Vouchers", "Delivered 3 Days Post Full Payment"],
@@ -389,7 +395,6 @@ const generatePdf = async (data: ItineraryData) => {
     ];
 
     drawTables(doc, serviceHeader, services, services.length * 10, 10, y + 30, 10, [0.4, 0.6]);
-    // y = renderScopeOfServiceSection(doc, y);
     y += 10
 
     const SummaryHeader = ["category", "count ", "details", "status/comments"]
@@ -407,18 +412,18 @@ const generatePdf = async (data: ItineraryData) => {
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(0, 0, 0);
-    doc.text("Inclusion ", 14, y + 60);
+    doc.text("Inclusion ", 10, y + 70);
     doc.setTextColor(138, 43, 226); // Purple for "Notes"
-    doc.text("Summary", doc.getTextWidth("Important ") + 14, y + 60);
+    doc.text("Summary", doc.getTextWidth("Important ") + 10, y + 70);
     drawTables(doc, SummaryHeader, SummaryData, SummaryData.length * 15, 10, y + 80, 7, [0.2, 0.1, 0.4, 0.3])
     y = 20;
-    doc.setFontSize(8);
+    doc.setFontSize(10);
     doc.setFont("helvetica", "Bold")
     doc.setTextColor("black");
-    doc.text("Transfer Policy(Refundable Upon Claim)", 20, y + 200);
-    doc.setFontSize(8);
+    doc.text("Transfer Policy(Refundable Upon Claim)", 10, y + 200);
+    doc.setFontSize(10);
     doc.setTextColor("gray");
-    doc.text("If any transfer is delayed beyond 15 minutes, customers may book an app-based or  radio taxi and claim a refund for that specific leg.", 20, y + 200 + 4);
+    doc.text("If any transfer is delayed beyond 15 minutes, customers may book an app-based or  radio taxi and claim a refund for that specific leg.", 10, y + 200 + 4);
 
 
     const headers1 = ["City", "Activity", "Type", "Time Required"]
@@ -450,13 +455,23 @@ const generatePdf = async (data: ItineraryData) => {
     doc.setTextColor(0, 0, 0);
     doc.text("Activity ", 14, y);
     doc.setTextColor(138, 43, 226); // Purple for "Notes"
-    doc.text("Table", doc.getTextWidth("Important ") + 14, y);
+    doc.text("Table", doc.getTextWidth("Important ") + 10, y);
     y += 10;
 
     drawTables(doc, headers1, activityData, activityData.length * 10, 12, y + 5, 5, [0.2, 0.4, 0.2, 0.2])
+    y += 10
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(0, 0, 0);
+    doc.text("Terms and ", 14, y + 190);
+    doc.setTextColor(138, 43, 226); // Purple for "Notes"
+    doc.text(" Condition", doc.getTextWidth("Important ") + 14, y + 190);
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "Bold")
+    doc.setTextColor("blue");
+    doc.text("Transfer Policy(Refundable Upon Claim)", 15, y + 200);
     doc.addPage()
 
-    // // Installment Table Header
     //! --------------Payment Plan-----------------------
     if (flights.length > 0) {
         if (y > 180) {
@@ -480,9 +495,9 @@ const generatePdf = async (data: ItineraryData) => {
                 y = 20;
             }
 
-            const boxX = 20;
-            const boxY = y - 20;
-            const boxWidth = 170;
+            const boxX = 15;
+            const boxY = y;
+            const boxWidth = 180;
             const boxHeight = 15;
 
             // Box with border and arrow effect (optional)
@@ -527,11 +542,7 @@ const generatePdf = async (data: ItineraryData) => {
     ];
 
     // Draw the dynamic table (can be placed anywhere in your PDF code)
-    drawTables(doc, headings, installments, installments.length * 7, 4, y, 6);
-
-
-    // // Calculate section heights
-
+    drawTables(doc, headings, installments, installments.length * 7, 15, y + 10, 6);
 
     y *= 2;
 
