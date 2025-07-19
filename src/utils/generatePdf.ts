@@ -9,7 +9,7 @@ import icon5 from "../assets/visapurple1.png";
 import image from "../assets/Rectangle5679.png"
 import blob from "../assets/Rectangle5688.png"
 import placeholderImage from "../assets/sample.jpg"
-import { drawTables, formatCustomDate, generateItineraryPDF, getCircularImageDataUrl, renderImportantNotesSection, renderScopeOfServiceSection } from "./PDFfunctions";
+import { drawTables, formatCustomDate, getCircularImageDataUrl } from "./PDFfunctions";
 import { addFooter } from "./PDFFooter";
 import footerLogo from "../assets/Group1707485521.png"
 import "../assets/fonts/Roboto-Italic-VariableFont_wdth,wght.ttf";
@@ -298,8 +298,11 @@ const generatePdf = async (data: ItineraryData) => {
         doc.setFontSize(8);
         doc.setTextColor("gray");
         doc.text("Note: All Flights Include Meals, Seat Choice (Excluding XL), and 20kg/25kg Checked Baggage.", 20, y);
-        y += 10;
+        y += 5;
+        doc.setDrawColor(200);
+        doc.line(20, y, 190, y);
     }
+
 
     // Hotel Booking Summary
     if (bookings.length > 0) {
@@ -310,7 +313,7 @@ const generatePdf = async (data: ItineraryData) => {
 
         doc.setFontSize(14);
         doc.setTextColor("#9333EA"); // Purple
-        doc.text("Hotel Bookings", 20, y);
+        doc.text("Hotel Bookings", 20, y + 5);
 
 
         const rows = bookings.map((b) => [
@@ -322,11 +325,7 @@ const generatePdf = async (data: ItineraryData) => {
         ])
         const rat = ["City", "Check In", "Check Out", "Nights", "Hotel Name"];
         y += rows.length * 30 + 10;
-        // doc.text(rows, 20, 20);
-        drawTables(doc, rat, [...rows], rows.length * 10, 17, 90);
-
-
-        // y = (doc as any).lastAutoTable.finalY + 10;
+        drawTables(doc, rat, [...rows], rows.length * 10, 17, 95);
 
         // Notes
         const notes = [
@@ -351,13 +350,45 @@ const generatePdf = async (data: ItineraryData) => {
         doc.addPage();
         y = 20;
     }
-    y = renderImportantNotesSection(doc, y);
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(0, 0, 0);
+    doc.text("Important ", 14, y);
+    doc.setTextColor(138, 43, 226); // Purple for "Notes"
+    doc.text("Notes", doc.getTextWidth("Important ") + 14, y);
+    const HeaderNotes = ["Point", "Details"]
+    const notes = [
+        ["Airlines Standard Policy", "In Case Of Visa Rejection, Visa Fees Or Any Other Non Cancellable Component Cannot Be Reimbursed At Any Cost."],
+        ["Flight/Hotel Cancellation", "In Case Of Visa Rejection, Visa Fees Or Any Other Non Cancellable Component Cannot Be Reimbursed At Any Cost."],
+        ["Trip Insurance", "In Case Of Visa Rejection, Visa Fees Or Any Other Non Cancellable Component Cannot Be Reimbursed At Any Cost."],
+        ["Hotel Check-In & Check Out", "In Case Of Visa Rejection, Visa Fees Or Any Other Non Cancellable Component Cannot Be Reimbursed At Any Cost."],
+        ["Visa Rejection", "In Case Of Visa Rejection, Visa Fees Or Any Other Non Cancellable Component Cannot Be Reimbursed At Any Cost."],
+    ];
+    drawTables(doc, HeaderNotes, notes, notes.length * 10, 10, y, [0.2, 0.8]);
+    // y = renderImportantNotesSection(doc, y);
 
     if (y > doc.internal.pageSize.height - bottomMargin) {
         doc.addPage();
         y = 20;
     }
-    y = renderScopeOfServiceSection(doc, y);
+    y = y * 2
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(0, 0, 0);
+    doc.text("Scope Of ", 14, y);
+    doc.setTextColor(138, 43, 226); // Purple for "Service"
+    doc.text("Service", doc.getTextWidth("Scope Of ") + 14, y);
+    const serviceHeader = ["Service", "Details"];
+    const services = [
+        ["Flight Tickets And Hotel Vouchers", "Delivered 3 Days Post Full Payment"],
+        ["Web Check-In", "Boarding Pass Delivery Via Email/WhatsApp"],
+        ["Support", "Chat Support – Response Time: 4 Hours"],
+        ["Cancellation Support", "Provided"],
+        ["Trip Support", "Response Time: 5 Minutes"],
+    ];
+
+    drawTables(doc, serviceHeader, services, services.length * 10, 10, y, [0.4, 0.6]);
+    // y = renderScopeOfServiceSection(doc, y);
 
 
     const SummaryHeader = ["category", "count ", "details", "status/comments"]
@@ -374,7 +405,7 @@ const generatePdf = async (data: ItineraryData) => {
     doc.setTextColor("#6D28D9"); // Purple
     doc.text("Inclusive Summary", 15, y + 5);
     y += 10;
-    drawTables(doc, SummaryHeader, SummaryData, SummaryData.length * 10, 10, 70)
+    drawTables(doc, SummaryHeader, SummaryData, SummaryData.length * 10, 10, 35, [0.2, 0.1, 0.4, 0.3])
     // Flight info note
     if (y > 270) {
         doc.addPage();

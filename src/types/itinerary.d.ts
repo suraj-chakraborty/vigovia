@@ -4,7 +4,7 @@ export interface Activity {
 }
 
 export interface DayPlan {
-    formattedDate(formattedDate: any, arg1: number, arg2: number, arg3: { align: "center"; }): unknown;
+    formattedDate?(formattedDate: string, arg1: number, arg2: number, arg3: { align: "center"; }): date;
     day: number;
     image: string;
     topic: string;
@@ -17,7 +17,7 @@ export interface FlightInfo {
     from: string;
     to: string;
     arrivalDate: string;
-    noOfTravellers: string;
+    noOfTravellers: ItineraryData["travelers"];
 }
 
 export interface ItineraryData {
@@ -45,4 +45,19 @@ export interface StaticData {
     activity: string,
     type: string,
     time: string,
+}
+
+
+export type ButtonProps = {
+    label: string;
+    onClick: () => void;
+    secondary?: boolean;
+};
+
+export type InputProps = {
+    label: string;
+    type?: string;
+    value: string | number;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    className?: string;
 }
