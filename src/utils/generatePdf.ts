@@ -134,12 +134,12 @@ const generatePdf = async (data: ItineraryData) => {
         const colStartX = startX + colWidth * index;
         const centerX = colStartX + colWidth / 2;
         // Label
-        doc.setFont(undefined, 'normal');
+        doc.setFont(Roboto, 'normal');
         doc.setTextColor(80);
         doc.text(label, centerX, y - 10, { align: "center" });
 
         // Value
-        doc.setFont(undefined, 'bold');
+        doc.setFont(Roboto, 'bold');
         doc.setTextColor(0);
         doc.text(values[index], colStartX + 5, y - 5, { align: "left" });
     });
@@ -187,7 +187,7 @@ const generatePdf = async (data: ItineraryData) => {
         const centerX = imageX + imageSize / 2;
 
         // bold date line
-        doc.setFont("helvetica", "bold");
+        doc.setFont("Roboto", "bold");
         doc.setFontSize(11);
         doc.setTextColor("black");
         doc.text(day.formattedDate, centerX + 22, imageY + imageSize + 7, { align: "center" });
@@ -195,7 +195,7 @@ const generatePdf = async (data: ItineraryData) => {
         // Description line (normal font)
         // Prepare description text
         const description = "Arrival in Singapore & City Exploration";
-        doc.setFont("helvetica", "normal");
+        doc.setFont("Roboto", "normal");
         doc.setFontSize(9);
 
         // Split the text if too long (e.g., max width of 70 units)
@@ -297,12 +297,12 @@ const generatePdf = async (data: ItineraryData) => {
             const fromCity = f.from || "N/A";
             const toCity = f.to || "N/A";
 
-            doc.setFont("helvetica", "bold");
+            doc.setFont("Roboto", "bold");
             doc.text(airline, infoX, boxY + 8);
             // Measure width of airline text to offset the next part
             const airlineWidth = doc.getTextWidth(airline + " ");
 
-            doc.setFont("helvetica", "normal");
+            doc.setFont("Roboto", "normal");
             doc.setFontSize(10);
             doc.setTextColor("#444");
             const textRoute = `From ${fromCity} (${fromCity.slice(0, 3).toUpperCase()}) To ${toCity} (${toCity.slice(0, 3).toUpperCase()})`;
@@ -334,7 +334,7 @@ const generatePdf = async (data: ItineraryData) => {
         }
 
         doc.setFontSize(14);
-        doc.setFont("helvetica", "bold");
+        doc.setFont("Roboto", "bold");
         doc.setTextColor(0, 0, 0);
         doc.text("Hotel ", 15, y - componentHeight);
         doc.setTextColor(138, 43, 226); // Purple for "Notes"
@@ -379,7 +379,7 @@ const generatePdf = async (data: ItineraryData) => {
         y = 20;
     }
     doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
+    doc.setFont("Roboto", "bold");
     doc.setTextColor(0, 0, 0);
     doc.text("Important ", 14, y);
     doc.setTextColor(138, 43, 226);
@@ -399,7 +399,7 @@ const generatePdf = async (data: ItineraryData) => {
     doc.addPage();
     y = 20;
     doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
+    doc.setFont("Roboto", "bold");
     doc.setTextColor(0, 0, 0);
     doc.text("Scope Of ", 14, y + 20);
     doc.setTextColor(138, 43, 226); // Purple for "Service"
@@ -429,7 +429,7 @@ const generatePdf = async (data: ItineraryData) => {
 
     y += 40
     doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
+    doc.setFont("Roboto", "bold");
     doc.setTextColor(0, 0, 0);
     doc.text("Inclusion ", 10, y + 70);
     doc.setTextColor(138, 43, 226); // Purple for "Notes"
@@ -437,7 +437,7 @@ const generatePdf = async (data: ItineraryData) => {
     drawTables(doc, SummaryHeader, SummaryData, SummaryData.length * 15, 10, y + 80, 7, [0.2, 0.1, 0.4, 0.3])
     y = 20;
     doc.setFontSize(10);
-    doc.setFont("helvetica", "bold")
+    doc.setFont("Roboto", "bold")
     doc.setTextColor("black");
     doc.text("Transfer Policy(Refundable Upon Claim)", 10, y + 200);
     doc.setFontSize(10);
@@ -470,7 +470,7 @@ const generatePdf = async (data: ItineraryData) => {
     }
     doc.addPage();
     doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
+    doc.setFont("Roboto", "bold");
     doc.setTextColor(0, 0, 0);
     doc.text("Activity ", 14, y);
     doc.setTextColor(138, 43, 226); // Purple for "Notes"
@@ -480,13 +480,13 @@ const generatePdf = async (data: ItineraryData) => {
     drawTables(doc, headers1, activityData, activityData.length * 10, 12, y + 5, 5, [0.2, 0.4, 0.2, 0.2])
     y += 10
     doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
+    doc.setFont("Roboto", "bold");
     doc.setTextColor(0, 0, 0);
     doc.text("Terms and ", 14, y + 190);
     doc.setTextColor(138, 43, 226); // Purple for "Notes"
     doc.text(" Condition", doc.getTextWidth("Important ") + 14, y + 190);
     doc.setFontSize(12);
-    doc.setFont("helvetica", "bold")
+    doc.setFont("Roboto", "bold")
     doc.setTextColor("#2F80ED");
     doc.text("Transfer Policy(Refundable Upon Claim)", 15, y + 200);
     doc.addPage()
@@ -499,7 +499,7 @@ const generatePdf = async (data: ItineraryData) => {
         }
 
         doc.setFontSize(14);
-        doc.setFont("helvetica", "bold");
+        doc.setFont("Roboto", "bold");
         doc.setTextColor(0, 0, 0);
         doc.text("Payment ", 15, y);
         doc.setTextColor(138, 43, 226); // Purple for "Notes"
@@ -544,10 +544,10 @@ const generatePdf = async (data: ItineraryData) => {
             const value = p.value || "N/A";
             // const toCity = f.to || "N/A";
 
-            doc.setFont("helvetica", "bold");
+            doc.setFont("Roboto", "bold");
             doc.text(value, infoX, boxY + 8);
 
-            doc.setFont("helvetica", "normal");
+            doc.setFont("Roboto", "normal");
             doc.setFontSize(10);
             doc.setTextColor("#444");
             y += boxHeight;
@@ -578,7 +578,7 @@ const generatePdf = async (data: ItineraryData) => {
 
     // Visa Details Title
     doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
+    doc.setFont("Roboto", "bold");
     doc.setTextColor(0, 0, 0);
     doc.text("Visa ", 15, y);
     doc.setTextColor(138, 43, 226); // Purple for "Notes"
@@ -607,13 +607,13 @@ const generatePdf = async (data: ItineraryData) => {
         const centerX = VcolStartX + VcolWidth / 2;
 
         // Label
-        doc.setFont("helvetica", "normal");
+        doc.setFont("Roboto", "normal");
         doc.setFontSize(10);
         doc.setTextColor(80);
         doc.text(label, centerX - 12, y + 7, { align: "left" });
 
         // Value
-        doc.setFont("helvetica", "bold");
+        doc.setFont("Roboto", "bold");
         doc.setFontSize(11);
         doc.setTextColor(0);
         doc.text(Visavalues[index], centerX - 12, y + 15, { align: "left" });
@@ -629,7 +629,7 @@ const generatePdf = async (data: ItineraryData) => {
     y += 10;
     // Footer CTA
     doc.setFontSize(16);
-    doc.setFont("helvetica", "bold");
+    doc.setFont("Roboto", "bold");
     doc.setTextColor(50, 0, 120);
     doc.text('PLAN.PACK.GO!', 105, y, { align: "center" });
 
