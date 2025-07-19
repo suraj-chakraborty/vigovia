@@ -43,6 +43,7 @@ export function drawTables(
     boxHeight: number,
     startX: number,
     startY: number,
+    rowgap: number | 10,
     colRatios: number[] | null,
     bottomBoxHeight: number = 20,
     // verticalSpacing = 20,
@@ -111,7 +112,7 @@ export function drawTables(
             return lines;
         });
 
-        const rowHeight = maxLinesInRow * 5; // Approx 14 px per line
+        const rowHeight = maxLinesInRow * rowgap;
 
         // Second pass: draw text
         for (let col = 0; col < numCols; col++) {

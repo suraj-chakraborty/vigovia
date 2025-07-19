@@ -13,6 +13,7 @@ export interface DayPlan {
 }
 
 export interface FlightInfo {
+    flightName: string
     departureDate: string;
     from: string;
     to: string;

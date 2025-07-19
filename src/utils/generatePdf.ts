@@ -66,15 +66,14 @@ const generatePdf = async (data: ItineraryData) => {
     doc.text(`${totalDays} Days ${nights} Nights`, HpageWidth / 2, y, { align: "center" });
     y += 5
     // Constants
-    const iconSize = 4; // width and height of each icon
-    const spacing = 5;  // space between icons
+    const iconSize = 4;
+    const spacing = 5;
     const numIcons = 5;
     const IconpageWidth = doc.internal.pageSize.getWidth();
 
-    // Calculate starting x to center icons
     const totalIconsWidth = iconSize * numIcons + spacing * (numIcons - 1);
     const IconstartX = (IconpageWidth - totalIconsWidth) / 2;
-    const iconY = y; // adjust based on where you want them vertically
+    const iconY = y;
 
     const icons = [icon1, icon2, icon3, icon4, icon5];
 
@@ -273,7 +272,7 @@ const generatePdf = async (data: ItineraryData) => {
             doc.setFontSize(11);
             doc.setTextColor("black");
 
-            const airline = "Fly Air India"; // You can make this dynamic
+            const airline = f.flightName; // You can make this dynamic
             const fromCity = f.from || "N/A";
             const toCity = f.to || "N/A";
 
@@ -290,7 +289,6 @@ const generatePdf = async (data: ItineraryData) => {
             y += boxHeight + 6;
         });
 
-        // Flight info note
         if (y > 270) {
             doc.addPage();
             y = 20;
@@ -304,10 +302,11 @@ const generatePdf = async (data: ItineraryData) => {
         doc.line(20, y, 190, y);
     }
 
-
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const componentHeight = 60;
     // Hotel Booking Summary
     if (bookings.length > 0) {
-        if (y > 200) {
+        if (y + componentHeight > pageHeight - 20) {
             doc.addPage();
             y = 20;
         }
@@ -326,8 +325,8 @@ const generatePdf = async (data: ItineraryData) => {
         ])
         const rat = ["City", "Check In", "Check Out", "Nights", "Hotel Name"];
         y += rows.length * 30 + 10;
-        drawTables(doc, rat, [...rows], rows.length * 10, 17, 95);
-
+        drawTables(doc, rat, [...rows], rows.length * 15, 20, 95, 5, [0.3, 0.2, 0.2, 0.1, 0.2]);
+        y += 30;
         // Notes
         const notes = [
             "1. All Hotels Are Tentative And Can Be Replaced With Similar.",
@@ -344,10 +343,13 @@ const generatePdf = async (data: ItineraryData) => {
     }
 
 
-    // Section: Important Notes + Scope of Service
     const bottomMargin = 40;
 
     if (y > doc.internal.pageSize.height - bottomMargin) {
+        doc.addPage();
+        y = 20;
+    }
+    if (y + componentHeight > pageHeight - bottomMargin) {
         doc.addPage();
         y = 20;
     }
@@ -365,14 +367,12 @@ const generatePdf = async (data: ItineraryData) => {
         ["Hotel Check-In & Check Out", "In Case Of Visa Rejection, Visa Fees Or Any Other Non Cancellable Component Cannot Be Reimbursed At Any Cost."],
         ["Visa Rejection", "In Case Of Visa Rejection, Visa Fees Or Any Other Non Cancellable Component Cannot Be Reimbursed At Any Cost."],
     ];
-    drawTables(doc, HeaderNotes, notes, notes.length * 10, 10, y, [0.2, 0.8]);
+    y += 15;
+    drawTables(doc, HeaderNotes, notes, notes.length * 13, 10, y, 5, [0.2, 0.8]);
     // y = renderImportantNotesSection(doc, y);
 
-    if (y > doc.internal.pageSize.height - bottomMargin) {
-        doc.addPage();
-        y = 20;
-    }
-    y = y * 2
+    doc.addPage();
+    y = 20;
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(0, 0, 0);
@@ -388,9 +388,9 @@ const generatePdf = async (data: ItineraryData) => {
         ["Trip Support", "Response Time: 5 Minutes"],
     ];
 
-    drawTables(doc, serviceHeader, services, services.length * 10, 10, y, [0.4, 0.6]);
+    drawTables(doc, serviceHeader, services, services.length * 10, 10, y + 30, 10, [0.4, 0.6]);
     // y = renderScopeOfServiceSection(doc, y);
-
+    y += 10
 
     const SummaryHeader = ["category", "count ", "details", "status/comments"]
     const SummaryData = [
@@ -402,26 +402,24 @@ const generatePdf = async (data: ItineraryData) => {
         doc.addPage();
         y = 20;
     }
-    doc.setFontSize(14);
-    doc.setTextColor("#6D28D9"); // Purple
-    doc.text("Inclusive Summary", 15, y + 5);
-    y += 10;
-    drawTables(doc, SummaryHeader, SummaryData, SummaryData.length * 10, 10, 35, [0.2, 0.1, 0.4, 0.3])
-    // Flight info note
-    if (y > 270) {
-        doc.addPage();
-        y = 20;
-    }
 
+    y += 40
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(0, 0, 0);
+    doc.text("Inclusion ", 14, y + 60);
+    doc.setTextColor(138, 43, 226); // Purple for "Notes"
+    doc.text("Summary", doc.getTextWidth("Important ") + 14, y + 60);
+    drawTables(doc, SummaryHeader, SummaryData, SummaryData.length * 15, 10, y + 80, 7, [0.2, 0.1, 0.4, 0.3])
+    y = 20;
     doc.setFontSize(8);
     doc.setFont("helvetica", "Bold")
-    doc.setTextColor("gray");
-    doc.text("Transfer Policy(Refundable Upon Claim)", 20, y * 3);
+    doc.setTextColor("black");
+    doc.text("Transfer Policy(Refundable Upon Claim)", 20, y + 200);
     doc.setFontSize(8);
     doc.setTextColor("gray");
-    doc.text("If any transfer is delayed beyond 15 minutes, customers may book an app-based or  radio taxi and claim a refund for that specific leg.", 20, y * 3 + 4);
-    y += 10;
-    doc.addPage()
+    doc.text("If any transfer is delayed beyond 15 minutes, customers may book an app-based or  radio taxi and claim a refund for that specific leg.", 20, y + 200 + 4);
+
 
     const headers1 = ["City", "Activity", "Type", "Time Required"]
     const activityData = [
@@ -442,47 +440,24 @@ const generatePdf = async (data: ItineraryData) => {
         ["Sydney", "Sydney Harbour Cruise & Taronga Zoo", "Airlines Standard", "2-3 hours"],
         ["Sydney", "Sydney Harbour Cruise & Taronga Zoo", "Airlines Standard", "2-3 hours"],
     ];
-    if (y > 200) {
+    if (y > doc.internal.pageSize.height - bottomMargin) {
         doc.addPage();
         y = 20;
     }
+    doc.addPage();
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(0, 0, 0);
+    doc.text("Activity ", 14, y);
+    doc.setTextColor(138, 43, 226); // Purple for "Notes"
+    doc.text("Table", doc.getTextWidth("Important ") + 14, y);
+    y += 10;
 
-    drawTables(doc, headers1, activityData, activityData.length * 12, 5, 10)
+    drawTables(doc, headers1, activityData, activityData.length * 10, 12, y + 5, 5, [0.2, 0.4, 0.2, 0.2])
     doc.addPage()
-    // y = generateItineraryPDF(doc, data1);
-
-
-    // Title
-    // doc.setFontSize(16);
-    // doc.setTextColor(50, 0, 120); // Violet
-    // doc.setFont("helvetica", "bold");
-    // doc.text('Payment Plan', 15, 20);
-
-    // y = 30;
-    // const lineHeight = 12;
-
-    // // Total Amount Box
-    // doc.setDrawColor(140, 130, 200); // Light violet
-    // doc.roundedRect(15, y, 180, lineHeight, 2, 2);
-    // doc.setFontSize(12);
-    // doc.setFont("helvetica", "normal");
-    // doc.setTextColor(0);
-    // doc.text('Total Amount', 20, y + 8);
-    // doc.setFont("helvetica", "bold");
-    // doc.text('₹ 9,00,000 For 3 Pax (Inclusive Of GST)', 100, y + 8);
-
-    // y += lineHeight + 4;
-
-    // // TCS Box
-    // doc.setFont("helvetica", "normal");
-    // doc.roundedRect(15, y, 180, lineHeight, 2, 2);
-    // doc.text('TCS', 20, y + 8);
-    // doc.text('Not Collected', 100, y + 8);
-
-    // y += lineHeight + 10;
 
     // // Installment Table Header
-
+    //! --------------Payment Plan-----------------------
     if (flights.length > 0) {
         if (y > 180) {
             doc.addPage();
@@ -491,17 +466,22 @@ const generatePdf = async (data: ItineraryData) => {
 
         doc.setFontSize(14);
         doc.setTextColor("#6D28D9"); // Purple
-        doc.text("Payment Plan", 20, y - 40);
+        doc.text("Payment Plan", 20, y);
         y += 10;
 
-        flights.forEach((f) => {
+        const payments = [
+            { label: "Total Amount", value: "₹ 9,00,000 For 3 Pax (Inclusive Of GST)" },
+            { label: "TCS", value: "Not Collected" },
+        ];
+
+        payments.map((p) => {
             if (y > 240) {
                 doc.addPage();
                 y = 20;
             }
 
             const boxX = 20;
-            const boxY = y - 35;
+            const boxY = y - 20;
             const boxWidth = 170;
             const boxHeight = 15;
 
@@ -517,27 +497,22 @@ const generatePdf = async (data: ItineraryData) => {
             doc.setTextColor("#000"); // date text color
             doc.setFontSize(12);
             doc.setFont("Roboto", "Bold");
-            doc.text(formatCustomDate(f.departureDate || "N/A"), boxX + 5, boxY + 8);
+            doc.text(p.label || "N/A", boxX + 5, boxY + 8);
 
-            // Flight info on right
             const infoX = boxX + 45;
             doc.setFontSize(11);
             doc.setTextColor("black");
 
-            const airline = "Fly Air India"; // You can make this dynamic
-            const fromCity = f.from || "N/A";
-            const toCity = f.to || "N/A";
+            // const airline = f.flightName; // You can make this dynamic
+            const value = p.value || "N/A";
+            // const toCity = f.to || "N/A";
 
             doc.setFont("helvetica", "bold");
-            doc.text(airline, infoX, boxY + 8);
-            // Measure width of airline text to offset the next part
-            const airlineWidth = doc.getTextWidth(airline + " ");
+            doc.text(value, infoX, boxY + 8);
 
             doc.setFont("helvetica", "normal");
             doc.setFontSize(10);
             doc.setTextColor("#444");
-            const textRoute = `From ${fromCity} (${fromCity.slice(0, 3).toUpperCase()}) To ${toCity} (${toCity.slice(0, 3).toUpperCase()})`;
-            doc.text(textRoute, infoX + airlineWidth, boxY + 8);
             y += boxHeight;
         });
     }
@@ -552,7 +527,7 @@ const generatePdf = async (data: ItineraryData) => {
     ];
 
     // Draw the dynamic table (can be placed anywhere in your PDF code)
-    drawTables(doc, headings, installments, installments.length * 6, 4, y);
+    drawTables(doc, headings, installments, installments.length * 7, 4, y, 6);
 
 
     // // Calculate section heights
@@ -568,25 +543,41 @@ const generatePdf = async (data: ItineraryData) => {
 
     y += 6;
 
-    // Visa Box
-    doc.setDrawColor(120, 120, 170);
-    doc.roundedRect(15, y, 180, 14, 2, 2);
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(0);
-    doc.text('Visa Type:', 20, y + 9);
-    doc.setFont("helvetica", "bold");
-    doc.text('Tourist', 45, y + 9);
+    //! --------------Visa Details-----------------------
+    const Visalabels = ["Visa Type:", "Validity:", "Type"];
+    const Visavalues = ["Tourist", "30 Days", "14/06/2025"];
 
-    doc.setFont("helvetica", "normal");
-    doc.text('Validity:', 80, y + 9);
-    doc.setFont("helvetica", "bold");
-    doc.text('30 Days', 105, y + 9);
+    const VboxWidth = 170;
+    const VboxHeight = 20;
+    const VstartX = 20;
+    const VnumCols = Visalabels.length;
+    const VcolWidth = boxWidth / VnumCols;
 
-    doc.setFont("helvetica", "normal");
-    doc.text('Processing Date:', 130, y + 9);
-    doc.setFont("helvetica", "bold");
-    doc.text('14/06/2025', 170, y + 9);
+    // Draw outer box
+    doc.setDrawColor(180);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(VstartX, y, VboxWidth, VboxHeight, 4, 4);
+
+    // Loop to draw each column content
+    Visalabels.forEach((label, index) => {
+        const VcolStartX = VstartX + VcolWidth * index;
+        const centerX = VcolStartX + VcolWidth / 2;
+
+        // Label
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(80);
+        doc.text(label, centerX - 12, y + 7, { align: "left" });
+
+        // Value
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(0);
+        doc.text(Visavalues[index], centerX - 12, y + 15, { align: "left" });
+    });
+
+    y += boxHeight;
+
 
     // Line Separator
     y += 20;

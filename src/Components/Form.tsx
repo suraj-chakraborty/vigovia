@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import type { DayPlan, FlightInfo, HotelBooking, ItineraryData } from "../types/itinerary";
 import logoImage from "../assets/Group1707485521.png"
 import generatePdf from "../utils/generatePdf";
-import Footer from "./Footer";
 
 const Form: React.FC = () => {
     const [loading, setLoading] = useState(false);
@@ -117,7 +116,7 @@ const Form: React.FC = () => {
     };
 
     const handleAddFlight = () => {
-        setFlights([...flights, { departureDate: "", from: "", to: "", arrivalDate: "", noOfTravellers: formData.travelers }]);
+        setFlights([...flights, { flightName: "", departureDate: "", from: "", to: "", arrivalDate: "", noOfTravellers: formData.travelers }]);
     };
 
     const handleFlightChange = (index: number, field: string, value: string) => {
@@ -267,6 +266,16 @@ const Form: React.FC = () => {
                     <h2 className="font-bold mt-8 mb-4 text-[#321E5D] text-xl">Flights</h2>
                     {flights.map((flight, index) => (
                         <div key={index} className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-4">
+                            <div className="flex flex-col">
+                                <label className="mb-1 font-medium text-[#321E5D]">Flight Name</label>
+                                <input
+                                    type="text"
+                                    placeholder="Name"
+                                    value={flight.flightName}
+                                    onChange={(e) => handleFlightChange(index, "flightName", e.target.value)}
+                                    className="border border-[#680099] p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#541C9C]"
+                                />
+                            </div>
                             <div className="flex flex-col">
                                 <label className="mb-1 font-medium text-[#321E5D]">Departure Date</label>
                                 <input
@@ -474,9 +483,6 @@ const Form: React.FC = () => {
                     Generate Itinerary PDF
                 </button>
             </form>
-            {/* Footer */}
-            <Footer />
-
         </div>
         ) : (
             <div className="flex items-center justify-center h-screen">
