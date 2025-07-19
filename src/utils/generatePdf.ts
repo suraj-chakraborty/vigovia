@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
 import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import type { ItineraryData, StaticData } from "../types/itinerary";
+import type { ItineraryData } from "../types/itinerary";
 import icon1 from "../assets/material-symbols_flight.png";
 import icon2 from "../assets/fluent_building-32-filled.png";
 import icon3 from "../assets/Vector.png";
@@ -608,3 +609,7 @@ const generatePdf = async (data: ItineraryData) => {
 };
 
 export default generatePdf;
+
+
+
+

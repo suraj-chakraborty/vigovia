@@ -45,6 +45,7 @@ const Form: React.FC = () => {
                 topic: "",
                 date: "",
                 image: "",
+                formattedDate: "",
                 activities: [
                     { time: "Morning", description: "" },
                     { time: "Afternoon", description: "" },
@@ -85,16 +86,24 @@ const Form: React.FC = () => {
             setFlights(flights.slice(0, -1)); // Remove the last flight
         }
     }
-    const handleDayChange = (index: number, field: string, value: string) => {
+    const handleDayChange = (index: number, field: keyof DayPlan, value: string) => {
         const updatedDays = [...days];
 
-        (updatedDays[index] as any)[field] = value;
+        updatedDays[index][field] = value as never;
         setDays(updatedDays);
     };
 
-    const handleBookingChange = (index: number, field: string, value: string) => {
+    const handleBookingChange = (
+        index: number,
+        field: keyof HotelBooking,
+        value: string
+    ) => {
         const updatedBookings = [...bookings];
-        (updatedBookings[index] as any)[field] = value;
+        if (field === "nights") {
+            updatedBookings[index].nights = Number(value);
+        } else {
+            updatedBookings[index][field] = value as never;
+        }
 
         const { checkIn, checkOut } = updatedBookings[index];
         updatedBookings[index].nights = calculateNights(checkIn, checkOut);
@@ -113,7 +122,10 @@ const Form: React.FC = () => {
 
     const handleFlightChange = (index: number, field: string, value: string) => {
         const updatedFlights = [...flights];
-        (updatedFlights[index] as any)[field] = value;
+        updatedFlights[index] = {
+            ...updatedFlights[index],
+            [field]: field === "noOfTravellers" ? Number(value) : value,
+        };
         setFlights(updatedFlights);
     };
 
@@ -149,14 +161,14 @@ const Form: React.FC = () => {
                 ...day,
                 formattedDate: formatDatePretty(day.date),
             }));
-            const finalData: ItineraryData = {
+            const finalData = {
                 ...formData,
                 days: formattedDays,
                 flights,
                 bookings,
 
             };
-            console.log("Final Data to be sent:", finalData);
+            // console.log("Final Data to be sent:", finalData);
 
             await generatePdf(finalData);
         } catch (err) {
@@ -167,7 +179,7 @@ const Form: React.FC = () => {
     };
 
     return (
-        !loading || loading ? (<div className="max-w-4xl mx-auto p-6 bg-[#FBF4FF] rounded-lg shadow-lg">
+        !loading || loading ? (<div className="max-w-4xl mx-auto pb-6 p-6 bg-[#FBF4FF] rounded-lg shadow-lg">
             {/* LOGO at Top */}
             <div className="flex justify-center mb-6">
                 <img src={logoImage} alt="Logo" className="h-16 md:h-20 object-contain" />
@@ -454,16 +466,17 @@ const Form: React.FC = () => {
                     </button>
                 </div>
 
-                {/* Footer */}
-                <Footer />
 
                 <button
                     type="submit"
-                    className="mt-8 w-full px-6 py-3 bg-[#680099] hover:bg-[#541C9C] text-white rounded-lg font-semibold transition-colors duration-300 cursor-pointer"
+                    className="mt-8 w-full px-6 py-3 bg-[#680099] hover:bg-[#541C9C] text-white rounded-lg font-semibold transition-colors duration-300 cursor-pointer mb-5"
                 >
                     Generate Itinerary PDF
                 </button>
             </form>
+            {/* Footer */}
+            <Footer />
+
         </div>
         ) : (
             <div className="flex items-center justify-center h-screen">
