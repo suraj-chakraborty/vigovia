@@ -13,11 +13,26 @@ import placeholderImage from "../assets/sample.jpg"
 import { drawTables, formatCustomDate, getCircularImageDataUrl } from "./PDFfunctions";
 import { addFooter } from "./PDFFooter";
 import footerLogo from "../assets/Group1707485521.png"
-import "../assets/fonts/Roboto-Italic-VariableFont_wdth,wght.ttf";
+import Button from "../assets/Rectangle423.png"
+
+
+
 
 
 const generatePdf = async (data: ItineraryData) => {
+
     const doc = new jsPDF();
+    // // Register fonts directly on the instance
+    // doc.addFileToVFS("Roboto-Regular.ttf", base64_regular);
+    // doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
+
+    // doc.addFileToVFS("Roboto-Bold.ttf", base64_bold);
+    // doc.addFont("Roboto-Bold.ttf", "Roboto", "bold");
+
+    // doc.addFileToVFS("Roboto-Light.ttf", base64_light);
+    // doc.addFont("Roboto-Light.ttf", "Roboto", "light");
+
+    // console.log(doc.getFontList());
     let y = 20;
 
     //logo 
@@ -44,7 +59,7 @@ const generatePdf = async (data: ItineraryData) => {
     const returning = new Date(returnDate);
     const diffInMs = returning.getTime() - departure.getTime();
     const totalDays = Math.ceil(diffInMs / (1000 * 60 * 60 * 24));
-    console.log(totalDays)
+    // console.log(totalDays)
     const nights = totalDays - 1;
 
 
@@ -151,7 +166,7 @@ const generatePdf = async (data: ItineraryData) => {
         doc.roundedRect(dayBoxX, dayBoxY, 12, 50, 5, 5, "F");
         doc.setTextColor("white");
         doc.setFontSize(15);
-        doc.setFont("Roboto", "Bold")
+        doc.setFont("Roboto", "bold")
         doc.text(`Day ${day.day}`, dayBoxX + 14, dayBoxY + 30, { angle: 90, align: "center" });
 
         // Image
@@ -171,7 +186,7 @@ const generatePdf = async (data: ItineraryData) => {
         // Center position for the text (you can calculate based on page width if needed)
         const centerX = imageX + imageSize / 2;
 
-        // Bold date line
+        // bold date line
         doc.setFont("helvetica", "bold");
         doc.setFontSize(11);
         doc.setTextColor("black");
@@ -216,7 +231,7 @@ const generatePdf = async (data: ItineraryData) => {
             // Draw label
             doc.setTextColor("black");
             doc.setFontSize(10);
-            doc.setFont("Roboto", "Bold")
+            doc.setFont("Roboto", "bold")
             doc.text(label + ":", timelineX + 6, textY);
 
             // Description
@@ -270,7 +285,7 @@ const generatePdf = async (data: ItineraryData) => {
 
             doc.setTextColor("#000"); // date text color
             doc.setFontSize(12);
-            doc.setFont("Roboto", "Bold");
+            doc.setFont("Roboto", "bold");
             doc.text(formatCustomDate(f.departureDate || "N/A"), boxX + 5, boxY + 8);
 
             // Flight info on right
@@ -422,7 +437,7 @@ const generatePdf = async (data: ItineraryData) => {
     drawTables(doc, SummaryHeader, SummaryData, SummaryData.length * 15, 10, y + 80, 7, [0.2, 0.1, 0.4, 0.3])
     y = 20;
     doc.setFontSize(10);
-    doc.setFont("helvetica", "Bold")
+    doc.setFont("helvetica", "bold")
     doc.setTextColor("black");
     doc.text("Transfer Policy(Refundable Upon Claim)", 10, y + 200);
     doc.setFontSize(10);
@@ -471,7 +486,7 @@ const generatePdf = async (data: ItineraryData) => {
     doc.setTextColor(138, 43, 226); // Purple for "Notes"
     doc.text(" Condition", doc.getTextWidth("Important ") + 14, y + 190);
     doc.setFontSize(12);
-    doc.setFont("helvetica", "Bold")
+    doc.setFont("helvetica", "bold")
     doc.setTextColor("#2F80ED");
     doc.text("Transfer Policy(Refundable Upon Claim)", 15, y + 200);
     doc.addPage()
@@ -518,7 +533,7 @@ const generatePdf = async (data: ItineraryData) => {
 
             doc.setTextColor("#000"); // date text color
             doc.setFontSize(12);
-            doc.setFont("Roboto", "Bold");
+            doc.setFont("Roboto", "bold");
             doc.text(p.label || "N/A", boxX + 5, boxY + 8);
 
             const infoX = boxX + 45;
@@ -553,7 +568,7 @@ const generatePdf = async (data: ItineraryData) => {
         ins.amount,
         ins.dueDate
     ])
-    console.log(InstallmentsData)
+    // console.log(InstallmentsData)
     const InstallmentHead = ["Installment", "amount", "DueDate"];
 
     // Draw the dynamic table (can be placed anywhere in your PDF code)
@@ -619,7 +634,10 @@ const generatePdf = async (data: ItineraryData) => {
     doc.text('PLAN.PACK.GO!', 105, y, { align: "center" });
 
     //!-------------------------------------------
-
+    y += 10
+    doc.addImage(Button, "PNG", 70, y, 70, 15);
+    doc.setTextColor("#ffffff");
+    doc.text("Book Now", 100, y + 10, { align: "center" });
 
     // Footer
     addFooter(doc);

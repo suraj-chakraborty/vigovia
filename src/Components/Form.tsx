@@ -120,10 +120,10 @@ const Form: React.FC = () => {
 
     const handleDelete = () => {
         if (days.length > 0) {
-            setDays(days.slice(0, -1)); // Remove the last day
+            setDays(days.slice(0, -1));
         }
         if (flights.length > 0) {
-            setFlights(flights.slice(0, -1)); // Remove the last flight
+            setFlights(flights.slice(0, -1));
         }
     }
     const handleDayChange = (index: number, field: keyof DayPlan, value: string) => {
@@ -209,18 +209,31 @@ const Form: React.FC = () => {
                 payments,
                 installments
             };
-            console.log("Final Data to be sent:", finalData);
+            // console.log("Final Data to be sent:", finalData);
 
             await generatePdf(finalData);
         } catch (err) {
             console.error("PDF generation failed", err);
         } finally {
-            setLoading(false); // stop loading indicator
+
+            setFormData({
+                name: "",
+                departureCity: "",
+                destinationCity: "",
+                departureDate: "",
+                returnDate: "",
+                travelers: 1,
+                bookings,
+            });
+            setDays([]);
+            setFlights([]);
+            setBookings([]);
+            setLoading(false);
         }
     };
 
     return (
-        !loading || loading ? (<div className="max-w-4xl mx-auto pb-6 p-6 bg-[#FBF4FF] rounded-lg shadow-lg">
+        !loading ? (<div className="max-w-4xl mx-auto pb-6 p-6 bg-[#FBF4FF] rounded-lg shadow-lg">
             {/* LOGO at Top */}
             <div className="flex justify-center mb-6">
                 <img src={logoImage} alt="Logo" className="h-16 md:h-20 object-contain" />
