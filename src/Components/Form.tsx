@@ -442,8 +442,7 @@ const Form: React.FC = () => {
                             {day.activities.map((activity, aIndex) => (
                                 <div key={aIndex} className="mb-3">
                                     <label className="block text-sm font-medium text-[#321E5D] mb-1">{activity.time}:</label>
-                                    <input
-                                        type="text"
+                                    <textarea
                                         placeholder={`Activity for ${activity.time}`}
                                         value={activity.description}
                                         onChange={(e) => handleActivityChange(index, aIndex, e.target.value)}
