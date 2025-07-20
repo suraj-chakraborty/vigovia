@@ -299,6 +299,7 @@ const Form: React.FC = () => {
                             type="date"
                             value={formData.departureDate}
                             onChange={(e) => setFormData({ ...formData, departureDate: e.target.value })}
+                            onFocus={(e) => e.target.showPicker?.()}
                             className="border border-[#680099] p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#541C9C]"
                             required
                         />
@@ -310,6 +311,7 @@ const Form: React.FC = () => {
                             type="date"
                             value={formData.returnDate}
                             onChange={(e) => setFormData({ ...formData, returnDate: e.target.value })}
+                            onFocus={(e) => e.target.showPicker?.()}
                             className="border border-[#680099] p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#541C9C]"
                             required
                         />
@@ -338,7 +340,8 @@ const Form: React.FC = () => {
                                     placeholder="Date"
                                     value={flight.departureDate}
                                     onChange={(e) => handleFlightChange(index, "departureDate", e.target.value)}
-                                    className="border border-[#680099] p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#541C9C]"
+                                    onFocus={(e) => e.target.showPicker?.()}
+                                    className="border cursor-pointer border-[#680099] p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#541C9C]"
                                 />
                             </div>
                             <div className="flex flex-col">
@@ -368,6 +371,8 @@ const Form: React.FC = () => {
                                     placeholder="Date"
                                     value={flight.arrivalDate}
                                     onChange={(e) => handleFlightChange(index, "arrivalDate", e.target.value)}
+                                    onFocus={(e) => e.target.showPicker?.()}
+
                                     className="border border-[#680099] p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#541C9C]"
                                 />
                             </div>
@@ -378,7 +383,8 @@ const Form: React.FC = () => {
                                     placeholder="No. of Travelers"
                                     value={flight.noOfTravellers}
                                     onChange={(e) => handleFlightChange(index, "noOfTravellers", e.target.value)}
-                                    className="border border-[#680099] p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#541C9C]"
+                                    onFocus={(e) => e.target.showPicker?.()}
+                                    className="border border-[#680099] p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-   [#541C9C]"
                                 />
                             </div>
                         </div>
@@ -411,6 +417,7 @@ const Form: React.FC = () => {
                                 type="date"
                                 value={day.date}
                                 onChange={(e) => handleDayChange(index, "date", e.target.value)}
+                                onFocus={(e) => e.target.showPicker?.()}
                                 className="border border-[#680099] p-3 rounded-lg w-full mb-4 focus:outline-none focus:ring-2 focus:ring-[#541C9C]"
                             />
                             <label className="block font-semibold text-[#321E5D] mb-2">Topic:</label>
@@ -492,6 +499,7 @@ const Form: React.FC = () => {
                                     placeholder="Check In"
                                     value={booking.checkIn}
                                     onChange={(e) => handleBookingChange(index, "checkIn", e.target.value)}
+                                    onFocus={(e) => e.target.showPicker?.()}
                                     className="border border-[#680099] p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#541C9C]"
                                 />
                             </div>
@@ -502,6 +510,7 @@ const Form: React.FC = () => {
                                     placeholder="Check Out"
                                     value={booking.checkOut}
                                     onChange={(e) => handleBookingChange(index, "checkOut", e.target.value)}
+                                    onFocus={(e) => e.target.showPicker?.()}
                                     className="border border-[#680099] p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#541C9C]"
                                 />
                             </div>
@@ -542,6 +551,7 @@ const Form: React.FC = () => {
                                 placeholder="Installment"
                                 value={item.installment}
                                 onChange={(e) => updateInstallment(index, "installment", e.target.value)}
+                                onFocus={(e) => e.target.showPicker?.()}
                             />
                             <input
                                 className="p-3 rounded-md border border-[#d3c2f2] bg-white focus:outline-none focus:ring-2 focus:ring-[#b993f8]"
