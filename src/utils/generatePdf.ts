@@ -26,6 +26,8 @@ const generatePdf = async (data: ItineraryData) => {
 
     const doc = new jsPDF();
     console.log(doc.getFontList())
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const componentHeight = 60;
 
     let y = 20;
     //logo 
@@ -34,14 +36,10 @@ const generatePdf = async (data: ItineraryData) => {
     const logoHeight = 20;
     const logoPageWidth = doc.internal.pageSize.getWidth();
 
-    // Centered X position
+
     const logoX = (logoPageWidth - logoWidth) / 2;
-    const logoY = 2; // Top padding
-
-    // Add the image
+    const logoY = 2;
     doc.addImage(logoBase64, "PNG", logoX, logoY, logoWidth, logoHeight);
-
-    // Push `y` down after logo to avoid overlap
     y = logoY + logoHeight + 10;
 
     const { name, departureCity, destinationCity, departureDate, returnDate, travelers, days, flights, bookings, payments, installments } = data;
@@ -72,6 +70,7 @@ const generatePdf = async (data: ItineraryData) => {
     doc.text(`Hi, ${name}!`, HpageWidth / 2, y, { align: "center" });
     y += 10;
     doc.setFontSize(18);
+    doc.setFont("Roboto", "bold")
     doc.setTextColor("white");
     doc.text(`${destinationCity} Itinerary`, HpageWidth / 2, y, { align: "center" });
     y += 8;
@@ -127,7 +126,7 @@ const generatePdf = async (data: ItineraryData) => {
         const colStartX = startX + colWidth * index;
         const centerX = colStartX + colWidth / 2;
         // Label
-        doc.setFont("Roboto", 'normal');
+        doc.setFont("Roboto", "bold");
         doc.setTextColor(80);
         doc.text(label, centerX, y - 10, { align: "center" });
 
@@ -159,7 +158,7 @@ const generatePdf = async (data: ItineraryData) => {
         doc.roundedRect(dayBoxX, dayBoxY, 12, 50, 5, 5, "F");
         doc.setTextColor("white");
         doc.setFontSize(15);
-        doc.setFont("Roboto", "normal")
+        doc.setFont("Roboto", "bold")
         doc.text(`Day ${day.day}`, dayBoxX + 14, dayBoxY + 30, { angle: 90, align: "center" });
 
         // Image
@@ -175,26 +174,21 @@ const generatePdf = async (data: ItineraryData) => {
             doc.text("Image not loaded", imageX + 25, imageY + 10);
         }
 
-        // Date & Subheading
-        // Center position for the text (you can calculate based on page width if needed)
         const centerX = imageX + imageSize / 2;
 
         // normal date line
-        doc.setFont("Roboto", "normal");
+        doc.setFont("Roboto", "bold");
         doc.setFontSize(11);
         doc.setTextColor("black");
         doc.text(day.formattedDate, centerX + 22, imageY + imageSize + 7, { align: "center" });
 
-        // Description line (normal font)
-        // Prepare description text
-        const description = "Arrival in Singapore & City Exploration";
+        const description = `Arrival in ${destinationCity} & City Exploration`;
         doc.setFont("Roboto", "normal");
         doc.setFontSize(9);
 
-        // Split the text if too long (e.g., max width of 70 units)
         const lines = doc.splitTextToSize(description, 40);
 
-        // Print each line with vertical spacing
+
         const startY = imageY + imageSize + 13;
         lines.forEach((line, index) => {
             doc.text(line, centerX + 20, startY + index * 5, { align: "center" });
@@ -214,7 +208,7 @@ const generatePdf = async (data: ItineraryData) => {
 
         activityTimes.forEach((label, index) => {
             const circleY = timelineY + index * 20;
-            const textY = circleY + 1.5;
+            const textY = circleY + .5;
 
             // Draw circle
             doc.setDrawColor("#000");
@@ -224,15 +218,20 @@ const generatePdf = async (data: ItineraryData) => {
             // Draw label
             doc.setTextColor("black");
             doc.setFontSize(10);
-            doc.setFont("Roboto", "normal")
+            doc.setFont("Roboto", "bold")
             doc.text(label + ":", timelineX + 6, textY);
-
             // Description
             const activity = day.activities.find((a) => a.time === label);
             if (activity && activity.description) {
+                const bulletX = timelineX + 35;
+                const lineHeight = 5;
+                const lines = activity.description.split("\n");
                 doc.setFontSize(9);
                 doc.setTextColor("#444");
-                doc.text(`• ${activity.description}`, timelineX + 35, textY, { maxWidth: 140 });
+                lines.forEach((line, i) => {
+                    const lineY = textY + i * lineHeight;
+                    doc.text(`• ${line}`, bulletX, lineY, { maxWidth: 140 });
+                });
             }
         });
 
@@ -243,6 +242,7 @@ const generatePdf = async (data: ItineraryData) => {
     };
 
 
+    y += 20
 
     // Flight Summary
     if (flights.length > 0) {
@@ -250,10 +250,16 @@ const generatePdf = async (data: ItineraryData) => {
             doc.addPage();
             y = 20;
         }
+        y += 20;
 
         doc.setFontSize(14);
-        doc.setTextColor("#6D28D9"); // Purple
-        doc.text("Flight Summary", 20, y);
+        doc.setTextColor(0, 0, 0);
+        doc.setFont("Roboto", "bold");
+        doc.text("Flight ", 15, y);
+        doc.setTextColor(138, 43, 226); // Purple for "Notes"
+        doc.setFont("Roboto", "bold");
+        doc.text("Summary", doc.getTextWidth("Important ") + 5, y);
+
         y += 10;
 
         flights.forEach((f) => {
@@ -262,9 +268,9 @@ const generatePdf = async (data: ItineraryData) => {
                 y = 20;
             }
 
-            const boxX = 20;
+            const boxX = 15;
             const boxY = y;
-            const boxWidth = 170;
+            const boxWidth = 180;
             const boxHeight = 15;
 
             // Box with border and arrow effect (optional)
@@ -278,7 +284,7 @@ const generatePdf = async (data: ItineraryData) => {
 
             doc.setTextColor("#000"); // date text color
             doc.setFontSize(12);
-            doc.setFont("Roboto", "normal");
+            doc.setFont("Roboto", "bold");
             doc.text(formatCustomDate(f.departureDate || "N/A"), boxX + 5, boxY + 8);
 
             // Flight info on right
@@ -290,7 +296,7 @@ const generatePdf = async (data: ItineraryData) => {
             const fromCity = f.from || "N/A";
             const toCity = f.to || "N/A";
 
-            doc.setFont("Roboto", "normal");
+            doc.setFont("Roboto", "bold");
             doc.text(airline, infoX, boxY + 8);
             // Measure width of airline text to offset the next part
             const airlineWidth = doc.getTextWidth(airline + " ");
@@ -317,8 +323,7 @@ const generatePdf = async (data: ItineraryData) => {
         y += y + 20
     }
 
-    const pageHeight = doc.internal.pageSize.getHeight();
-    const componentHeight = 60;
+
     // Hotel Booking Summary
     if (bookings.length > 0) {
         if (y + componentHeight > pageHeight - 20) {
@@ -327,7 +332,7 @@ const generatePdf = async (data: ItineraryData) => {
         }
 
         doc.setFontSize(14);
-        doc.setFont("Roboto", "normal");
+        doc.setFont("Roboto", "bold");
         doc.setTextColor(0, 0, 0);
         doc.text("Hotel ", 15, y - componentHeight);
         doc.setTextColor(138, 43, 226); // Purple for "Notes"
@@ -372,7 +377,7 @@ const generatePdf = async (data: ItineraryData) => {
         y = 20;
     }
     doc.setFontSize(14);
-    doc.setFont("Roboto", "normal");
+    doc.setFont("Roboto", "bold");
     doc.setTextColor(0, 0, 0);
     doc.text("Important ", 14, y);
     doc.setTextColor(138, 43, 226);
@@ -392,7 +397,7 @@ const generatePdf = async (data: ItineraryData) => {
     doc.addPage();
     y = 20;
     doc.setFontSize(14);
-    doc.setFont("Roboto", "normal");
+    doc.setFont("Roboto", "bold");
     doc.setTextColor(0, 0, 0);
     doc.text("Scope Of ", 14, y + 20);
     doc.setTextColor(138, 43, 226); // Purple for "Service"
@@ -422,7 +427,7 @@ const generatePdf = async (data: ItineraryData) => {
 
     y += 40
     doc.setFontSize(14);
-    doc.setFont("Roboto", "normal");
+    doc.setFont("Roboto", "bold");
     doc.setTextColor(0, 0, 0);
     doc.text("Inclusion ", 10, y + 70);
     doc.setTextColor(138, 43, 226); // Purple for "Notes"
@@ -466,7 +471,7 @@ const generatePdf = async (data: ItineraryData) => {
     }
     doc.addPage();
     doc.setFontSize(14);
-    doc.setFont("Roboto", "normal");
+    doc.setFont("Roboto", "bold");
     doc.setTextColor(0, 0, 0);
     doc.text("Activity ", 14, y);
     doc.setTextColor(138, 43, 226); // Purple for "Notes"
@@ -476,7 +481,7 @@ const generatePdf = async (data: ItineraryData) => {
     drawTables(doc, headers1, activityData, activityData.length * 10, 12, y + 5, 5, [0.2, 0.4, 0.2, 0.2])
     y += 10
     doc.setFontSize(14);
-    doc.setFont("Roboto", "normal");
+    doc.setFont("Roboto", "bold");
     doc.setTextColor(0, 0, 0);
     doc.text("Terms and ", 14, y + 190);
     doc.setTextColor(138, 43, 226); // Purple for "Notes"
@@ -495,7 +500,7 @@ const generatePdf = async (data: ItineraryData) => {
         }
 
         doc.setFontSize(14);
-        doc.setFont("Roboto", "normal");
+        doc.setFont("Roboto", "bold");
         doc.setTextColor(0, 0, 0);
         doc.text("Payment ", 15, y);
         doc.setTextColor(138, 43, 226); // Purple for "Notes"
@@ -508,10 +513,6 @@ const generatePdf = async (data: ItineraryData) => {
         // ];
 
         payments.map((p) => {
-            if (y > 240) {
-                doc.addPage();
-                y = 20;
-            }
 
             const boxX = 15;
             const boxY = y;
@@ -529,7 +530,7 @@ const generatePdf = async (data: ItineraryData) => {
 
             doc.setTextColor("#000"); // date text color
             doc.setFontSize(12);
-            doc.setFont("Roboto", "normal");
+            doc.setFont("Roboto", "bold");
             doc.text(p.label || "N/A", boxX + 5, boxY + 8);
 
             const infoX = boxX + 45;
@@ -566,7 +567,7 @@ const generatePdf = async (data: ItineraryData) => {
     // Draw the dynamic table (can be placed anywhere in your PDF code)
     drawTables(doc, InstallmentHead, InstallmentsData, InstallmentsData.length * 10, 15, y + 10, 6);
 
-    y += 100;
+    // y += 100;
 
 
     if (y > 180) {
@@ -575,7 +576,7 @@ const generatePdf = async (data: ItineraryData) => {
     }
     // Visa Details Title
     doc.setFontSize(14);
-    doc.setFont("Roboto", "normal");
+    doc.setFont("Roboto", "bold");
     doc.setTextColor(0, 0, 0);
     doc.text("Visa ", 15, y);
     doc.setTextColor(138, 43, 226); // Purple for "Notes"
