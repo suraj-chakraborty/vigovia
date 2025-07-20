@@ -28,6 +28,7 @@ const generatePdf = async (data: ItineraryData) => {
     console.log(doc.getFontList())
     const pageHeight = doc.internal.pageSize.getHeight();
     const componentHeight = 60;
+    const bottomMargin = 40;
 
     let y = 20;
     //logo 
@@ -319,13 +320,13 @@ const generatePdf = async (data: ItineraryData) => {
         y += 5;
         doc.setDrawColor(200);
         doc.line(20, y, 190, y);
-        y += y
+        y += 70
     }
 
 
     // Hotel Booking Summary
     if (bookings.length > 0) {
-        if (y + componentHeight > pageHeight - 20) {
+        if (y > 240) {
             doc.addPage();
             y = 20;
         }
@@ -348,8 +349,8 @@ const generatePdf = async (data: ItineraryData) => {
         ])
         const rat = ["City", "Check In", "Check Out", "Nights", "Hotel Name"];
         y += 20;
-        drawTables(doc, rat, [...rows], rows.length * 15, 20, y - componentHeight, 10, [0.3, 0.2, 0.2, 0.1, 0.2]);
-        y += 10;
+        drawTables(doc, rat, [...rows], rows.length * 15, 15, y - componentHeight, 10, [0.3, 0.2, 0.2, 0.1, 0.2]);
+        y += 20;
         // Notes
         const notes = [
             "1. All Hotels Are Tentative And Can Be Replaced With Similar.",
@@ -365,24 +366,9 @@ const generatePdf = async (data: ItineraryData) => {
         });
     }
 
+    y += 10;
 
-    const bottomMargin = 40;
 
-    if (y > doc.internal.pageSize.height - bottomMargin) {
-        doc.addPage();
-        y = 20;
-    }
-    if (y + componentHeight > pageHeight - bottomMargin) {
-        doc.addPage();
-        y = 20;
-    }
-    doc.setFontSize(14);
-    doc.setFont("Roboto", "bold");
-    doc.setTextColor(0, 0, 0);
-    doc.text("Important ", 14, y);
-    doc.setTextColor("#680099"
-    );
-    doc.text("Notes", doc.getTextWidth("Important ") + 14, y);
     const HeaderNotes = ["Point", "Details"]
     const notes = [
         ["Airlines Standard Policy", "In Case Of Visa Rejection, Visa Fees Or Any Other Non Cancellable Component Cannot Be Reimbursed At Any Cost."],
@@ -391,19 +377,23 @@ const generatePdf = async (data: ItineraryData) => {
         ["Hotel Check-In & Check Out", "In Case Of Visa Rejection, Visa Fees Or Any Other Non Cancellable Component Cannot Be Reimbursed At Any Cost."],
         ["Visa Rejection", "In Case Of Visa Rejection, Visa Fees Or Any Other Non Cancellable Component Cannot Be Reimbursed At Any Cost."],
     ];
-    y += 15;
-    drawTables(doc, HeaderNotes, notes, notes.length * 13, 10, y, 5, [0.2, 0.8]);
-    // y = renderImportantNotesSection(doc, y);
 
-    doc.addPage();
-    y = 20;
+    if (notes.length * 13 > pageHeight - (y + bottomMargin)) {
+        doc.addPage();
+        y = 20;
+    }
+    y += 10;
     doc.setFontSize(14);
     doc.setFont("Roboto", "bold");
     doc.setTextColor(0, 0, 0);
-    doc.text("Scope Of ", 14, y + 20);
+    doc.text("Important ", 14, y);
     doc.setTextColor("#680099"
-    ); // Purple for "Service"
-    doc.text("Service", doc.getTextWidth("Scope Of ") + 14, y + 20);
+    );
+    doc.text("Notes", doc.getTextWidth("Important ") + 14, y);
+
+    y += 15;
+    drawTables(doc, HeaderNotes, notes, notes.length * 13, 10, y, 5, [0.2, 0.8]);
+    // y = renderImportantNotesSection(doc, y);
     const serviceHeader = ["Service", "Details"];
     const services = [
         ["Flight Tickets And Hotel Vouchers", "Delivered 3 Days Post Full Payment"],
@@ -412,9 +402,22 @@ const generatePdf = async (data: ItineraryData) => {
         ["Cancellation Support", "Provided"],
         ["Trip Support", "Response Time: 5 Minutes"],
     ];
+    if (services.length * 10 > pageHeight - (y + bottomMargin)) {
+        doc.addPage();
+        y = 20;
+    }
+    y += 80;
+    doc.setFontSize(14);
+    doc.setFont("Roboto", "bold");
+    doc.setTextColor(0, 0, 0);
+    doc.text("Scope Of ", 14, y + 20);
+    doc.setTextColor("#680099"
+    ); // Purple for "Service"
+    doc.text("Service", doc.getTextWidth("Scope Of ") + 14, y + 20);
+
 
     drawTables(doc, serviceHeader, services, services.length * 10, 10, y + 30, 10, [0.4, 0.6]);
-    y += 10
+
 
     const SummaryHeader = ["category", "count ", "details", "status/comments"]
     const SummaryData = [
@@ -422,12 +425,11 @@ const generatePdf = async (data: ItineraryData) => {
         ["Tourist Tax", 2, "Yotel (Singapore), Oakwood (Sydney), Mercure (Cairns),  Novotel(Gold Coast), Holiday Inn(Melbourne) ", "Awaiting  Confirmation"],
         ["Hotel", 2, "Airport to Hotel - Hotel to Attractions - Day trips if any", "Included"]
     ]
-    if (y > doc.internal.pageSize.height - bottomMargin) {
+
+    if (SummaryData.length * 18 < pageHeight - (y + bottomMargin)) {
         doc.addPage();
         y = 20;
     }
-
-    y += 40
     doc.setFontSize(14);
     doc.setFont("Roboto", "bold");
     doc.setTextColor(0, 0, 0);
@@ -435,7 +437,7 @@ const generatePdf = async (data: ItineraryData) => {
     doc.setTextColor("#680099"
     ); // Purple for "Notes"
     doc.text("Summary", doc.getTextWidth("Important ") + 10, y + 70);
-    drawTables(doc, SummaryHeader, SummaryData, SummaryData.length * 15, 10, y + 80, 7, [0.2, 0.1, 0.4, 0.3])
+    drawTables(doc, SummaryHeader, SummaryData, SummaryData.length * 18, 10, y + 80, 8, [0.2, 0.1, 0.4, 0.3])
     y = 20;
     doc.setFontSize(10);
     doc.setFont("Roboto", "normal")
@@ -580,7 +582,7 @@ const generatePdf = async (data: ItineraryData) => {
         doc.addPage();
         y = 20;
     }
-    y += componentHeight - 30;
+    y += componentHeight + 30;
     // Visa Details Title
     doc.setFontSize(14);
     doc.setFont("Roboto", "bold");
@@ -590,7 +592,7 @@ const generatePdf = async (data: ItineraryData) => {
     ); // Purple for "Notes"
     doc.text("Details", doc.getTextWidth("Important ") + 5, y);
 
-    y += 6;
+    y += 10;
 
     //! --------------Visa Details-----------------------
     const Visalabels = ["Visa Type:", "Validity:", "Type"];

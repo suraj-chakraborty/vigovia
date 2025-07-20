@@ -52,7 +52,7 @@ export function drawTables(
     const margin = startX;
     const numCols = headings.length;
     const containerWidth = pageWidth - 2 * margin;
-    const colGap = 2;
+    const colGap = 2.5;
 
     let colWidths: number[];
     if (colRatios && colRatios.length === numCols) {

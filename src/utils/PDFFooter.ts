@@ -14,10 +14,10 @@ export const addFooter = (doc: jsPDF) => {
         // Left Section
         doc.setFontSize(9);
         doc.setTextColor("#000");
-        doc.text("Vigovia Tech Pvt. Ltd", 20, 278);
+        doc.text("Vigovia Tech Pvt. Ltd", 15, 278);
         doc.setTextColor("#444");
-        doc.text("Registered Office: Hd-109 Cinnabar Hills,", 20, 282, { align: "left" });
-        doc.text("Links Business Park, Karnataka, India.", 20, 286);
+        doc.text("Registered Office: Hd-109 Cinnabar Hills,", 15, 282, { align: "left" });
+        doc.text("Links Business Park, Karnataka, India.", 15, 286);
 
         // Right Section
         doc.setFontSize(9);
@@ -27,10 +27,10 @@ export const addFooter = (doc: jsPDF) => {
 
         // Logo
         try {
-            doc.addImage(footerLogo, "PNG", 160, 275, 30, 15,);
+            doc.addImage(footerLogo, "PNG", 170, 275, 30, 15,);
         } catch {
             doc.setTextColor("red");
-            doc.text("Logo not found", 160, 278);
+            doc.text("Logo not found", 170, 278);
         }
     }
 };
